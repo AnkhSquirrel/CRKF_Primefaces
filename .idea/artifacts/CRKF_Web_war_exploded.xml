@@ -1,0 +1,31 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="CRKF_Web:war exploded">
+    <output-path>$PROJECT_DIR$/target/CRKF</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <exploded>true</exploded>
+        <module>CRKF_Web</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="CRKF_Web" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: jakarta.annotation:jakarta.annotation-api:2.1.0" />
+          <element id="library" level="project" name="Maven: org.glassfish:jakarta.faces:4.0.0" />
+          <element id="library" level="project" name="Maven: org.jboss.weld.servlet:weld-servlet-shaded:5.1.0.Final" />
+          <element id="library" level="project" name="Maven: org.primefaces:primefaces:jakarta:12.0.0" />
+          <element id="library" level="project" name="Maven: org.webjars.npm:primeflex:3.2.1" />
+          <element id="library" level="project" name="Maven: com.microsoft.sqlserver:mssql-jdbc:11.2.1.jre17" />
+        </element>
+      </element>
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/target/CRKF/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="javaee-facet-resources" facet="CRKF_Web/web/Web" />
+    </root>
+  </artifact>
+</component>
