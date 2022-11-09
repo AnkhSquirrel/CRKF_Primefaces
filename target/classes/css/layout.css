@@ -1,0 +1,31 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/* --- HEADER --- */
+#headerHead{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 20px;
+}
+
+#headerIcon{
+    width: auto;
+    height: 100px;
+}
+
+#headerMenu{
+    margin: 0 0 20px 0;
+}
+
+
+/* --- FOOTER --- */
+#footer{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin: 20px 40% 0 40%;
+}
+
