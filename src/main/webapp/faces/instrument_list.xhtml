@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      lang="fr">
+<f:view>
+    <h:body>
+        <ui:composition template="templates/layout.xhtml"
+                        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                        xmlns:h="http://xmlns.jcp.org/jsf/html">
+            <ui:define name="title">Instrument - CRKF</ui:define>
+            <ui:define name="content">
+                <div class="card crud-demo">
+                    <h:form id="form">
+                        <p:growl id="messages" showDetail="true" />
+
+                        <p:toolbar>
+                            <p:toolbarGroup>
+                                <p:commandButton value="New" icon="pi pi-plus"
+                                                 update=":dialogs:manage-product-content" oncomplete="PF('manageProductDialog').show()"
+                                                 styleClass="ui-button-success" style="margin-right: .5rem">
+                                    <p:resetInput target=":dialogs:manage-product-content" />
+                                </p:commandButton>
+                                <p:commandButton id="delete-products-button"
+                                                 icon="pi pi-trash"
+                                                 styleClass="ui-button-danger" update="@this">
+                                    <p:confirm header="Confirmation" message="Delete the selected products?"
+                                               icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+                            </p:toolbarGroup>
+                        </p:toolbar>
+
+                        <p:dataTable id="dt-instruments" widgetVar="dtInstrument" var="instrument" value="#{instrumentBean.instrumentList}"
+                                     reflow="true" styleClass="products-table" selection="#{instrumentBean.selectedInstruments}"
+                                     rowKey="#{instrument.instrumentId}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+
+                            <f:facet name="header">
+                                <div class="products-table-header">
+                                    <span style="font-weight: bold">INSTRUMENT</span>
+                                    <span class="filter-container ui-input-icon-left"> <i class="pi pi-search"></i>
+                                        <p:inputText id="globalFilter" onkeyup="PF('dtInstrument').filter()" placeholder="Search" />
+                                    </span>
+                                </div>
+                            </f:facet>
+
+                            <p:ajax event="rowSelect" update=":form:delete-products-button" />
+                            <p:ajax event="rowUnselect" update=":form:delete-products-button" />
+                            <p:ajax event="rowSelectCheckbox" update=":form:delete-products-button" />
+                            <p:ajax event="rowUnselectCheckbox" update=":form:delete-products-button" />
+                            <p:ajax event="toggleSelect" update=":form:delete-products-button" />
+
+                            <p:column selectionMode="multiple" exportable="false"></p:column>
+
+                            <p:column headerText="Id" sortBy="#{instrument.instrumentId}" filterBy="#{instrument.instrumentId}">
+                                <h:outputText value="#{instrument.instrumentId}" />
+                            </p:column>
+                            <p:column headerText="Libelle" sortBy="#{instrument.instrumentLibelle}" filterBy="#{instrument.instrumentLibelle}">
+                                <h:outputText value="#{instrument.instrumentLibelle}" />
+                            </p:column>
+                            <p:column exportable="false">
+                                <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-product-content"
+                                                 oncomplete="PF('manageProductDialog').show()"
+                                                 styleClass="edit-button rounded-button ui-button-success" process="@this">
+                                    <f:setPropertyActionListener value="#{instrument}" target="#{instrumentBean.selectedInstrument}" />
+                                    <p:resetInput target=":dialogs:manage-product-content" />
+                                </p:commandButton>
+                                <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
+                                                 process="@this"
+                                                 oncomplete="PF('deleteProductDialog').show()">
+                                    <f:setPropertyActionListener value="#{instrument}" target="#{instrumentBean.selectedInstrument}" />
+                                </p:commandButton>
+                            </p:column>
+
+                        </p:dataTable>
+                    </h:form>
+
+                   <h:form id="dialogs">
+                        <p:dialog header="Product Details" showEffect="fade" modal="true" widgetVar="manageProductDialog"
+                                  responsive="true">
+                            <p:outputPanel id="manage-product-content" class="ui-fluid">
+                                <p:outputPanel rendered="#{not empty instrumentBean.selectedInstrument}">
+                                    <div class="field">
+                                        <p:outputLabel for="name">Name</p:outputLabel>
+                                        <p:inputText id="name" value="#{instrumentBean.selectedInstrument.instrumentLibelle}" required="true" />
+                                    </div>
+                                </p:outputPanel>
+                            </p:outputPanel>
+
+                            <f:facet name="footer">
+                                <p:commandButton value="Save" icon="pi pi-check" actionListener="#{instrumentBean.saveInstrument}"
+                                                 update="manage-product-content" process="manage-product-content @this" />
+                                <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageProductDialog').hide()"
+                                                 class="ui-button-secondary" type="button" />
+                            </f:facet>
+                        </p:dialog>
+
+                        <p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade" width="300"
+                                         message="Delete the product?" header="Confirm" severity="warn">
+                            <p:commandButton value="Yes" icon="pi pi-check"
+                                             process="@this" update=":form:delete-products-button"
+                                             oncomplete="PF('deleteProductDialog').hide()" />
+                            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                             onclick="PF('deleteProductDialog').hide()" />
+                        </p:confirmDialog>
+
+                        <p:confirmDialog global="true" showEffect="fade" width="300">
+                            <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"
+                                             icon="pi pi-times" />
+                        </p:confirmDialog>
+                    </h:form>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</f:view>
+</html>

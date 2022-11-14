@@ -1,8 +1,8 @@
 package fr.kyo.crkf_web.dao;
 
+import com.microsoft.sqlserver.jdbc.SQLServerDataSource;
+
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
 public class CRKFConnect {
 
@@ -11,20 +11,24 @@ public class CRKFConnect {
     private CRKFConnect(){}
 
     public static Connection getInstance() {
-        try {
-            while (connexion == null || connexion.isClosed()) {
-                String dbURL = "jdbc:sqlserver://127.0.0.1:1433;DatabaseName=CRKF;encrypt=false";
-                String user = "sa";
-                String pass = "azerty@123456";
-                try {
-                    connexion = DriverManager.getConnection(dbURL, user, pass);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        if (connexion == null) {
+            try {
+                SQLServerDataSource ds = new SQLServerDataSource();
+                ds.setServerName("127.0.0.1");
+                ds.setPortNumber(1433);
+                ds.setDatabaseName("CRKF");
+                ds.setIntegratedSecurity(false);
+                ds.setEncrypt(false);
+                ds.setUser("sa");
+                ds.setPassword("azerty@123456");
 
+                connexion = ds.getConnection();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+
+            // Handle any errors that may have occurred.
+            catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return connexion;
     }
