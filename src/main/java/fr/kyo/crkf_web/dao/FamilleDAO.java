@@ -55,8 +55,8 @@ public class FamilleDAO extends DAO<Famille> {
         String requete = "INSERT INTO Famille (famille,id_classification) VALUES (?,?)";
         try (PreparedStatement  preparedStatement = connection.prepareStatement(requete, Statement.RETURN_GENERATED_KEYS)) {
             connection.setAutoCommit(false);
-            preparedStatement.setString( 1 , objet.getfamille());
-            preparedStatement.setInt(2, objet.getclassification().getClassificationId());
+            preparedStatement.setString( 1 , objet.getFamilleLibelle());
+            preparedStatement.setInt(2, objet.getClassification().getClassificationId());
             preparedStatement.executeUpdate();
             ResultSet rs = preparedStatement.getGeneratedKeys();
             if(rs.next()) return rs.getInt(1);
@@ -76,8 +76,8 @@ public class FamilleDAO extends DAO<Famille> {
         String requete = "UPDATE Famille SET famille = ?, id_classification = ? WHERE id_famille = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(requete)){
             connection.setAutoCommit(false);
-            preparedStatement.setString(1, object.getfamille());
-            preparedStatement.setInt(2, object.getclassification().getClassificationId());
+            preparedStatement.setString(1, object.getFamilleLibelle());
+            preparedStatement.setInt(2, object.getClassification().getClassificationId());
             preparedStatement.setInt(3, object.getFamilleId());
             preparedStatement.executeUpdate();
             connection.commit();

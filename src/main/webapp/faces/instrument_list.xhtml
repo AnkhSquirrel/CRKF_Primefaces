@@ -20,15 +20,16 @@
 
                         <p:toolbar>
                             <p:toolbarGroup>
-                                <p:commandButton value="New" icon="pi pi-plus"
-                                                 update=":dialogs:manage-product-content" oncomplete="PF('manageProductDialog').show()"
+                                <p:commandButton value="Nouveau" icon="pi pi-plus" actionListener="#{instrumentBean.newInstrument}"
+                                                 update=":dialogs:manage-product-content" oncomplete="PF('manageInstrumentDialog').show()"
                                                  styleClass="ui-button-success" style="margin-right: .5rem">
                                     <p:resetInput target=":dialogs:manage-product-content" />
                                 </p:commandButton>
-                                <p:commandButton id="delete-products-button"
+                                <p:commandButton id="delete-instruments-button"
                                                  icon="pi pi-trash"
-                                                 styleClass="ui-button-danger" update="@this">
-                                    <p:confirm header="Confirmation" message="Delete the selected products?"
+                                                 styleClass="ui-button-danger" update="@this"
+                                                 actionListener="#{instrumentBean.deleteInstruments}">
+                                    <p:confirm header="Confirmation" message="Supprimer les instruments selectionner?"
                                                icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>
                             </p:toolbarGroup>
@@ -47,11 +48,11 @@
                                 </div>
                             </f:facet>
 
-                            <p:ajax event="rowSelect" update=":form:delete-products-button" />
-                            <p:ajax event="rowUnselect" update=":form:delete-products-button" />
-                            <p:ajax event="rowSelectCheckbox" update=":form:delete-products-button" />
-                            <p:ajax event="rowUnselectCheckbox" update=":form:delete-products-button" />
-                            <p:ajax event="toggleSelect" update=":form:delete-products-button" />
+                            <p:ajax event="rowSelect" update=":form:delete-instruments-button" />
+                            <p:ajax event="rowUnselect" update=":form:delete-instruments-button" />
+                            <p:ajax event="rowSelectCheckbox" update=":form:delete-instruments-button" />
+                            <p:ajax event="rowUnselectCheckbox" update=":form:delete-instruments-button" />
+                            <p:ajax event="toggleSelect" update=":form:delete-instruments-button" />
 
                             <p:column selectionMode="multiple" exportable="false"></p:column>
 
@@ -63,14 +64,15 @@
                             </p:column>
                             <p:column exportable="false">
                                 <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-product-content"
-                                                 oncomplete="PF('manageProductDialog').show()"
+                                                 oncomplete="PF('manageInstrumentDialog').show()"
                                                  styleClass="edit-button rounded-button ui-button-success" process="@this">
-                                    <f:setPropertyActionListener value="#{instrument}" target="#{instrumentBean.selectedInstrument}" />
+                                    <f:setPropertyActionListener value="#{instrument.familles}" target="#{instrumentBean.selectedFamilles}"/>
+                                    <f:setPropertyActionListener value="#{instrument}" target="#{instrumentBean.selectedInstrument}"  />
                                     <p:resetInput target=":dialogs:manage-product-content" />
                                 </p:commandButton>
                                 <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
                                                  process="@this"
-                                                 oncomplete="PF('deleteProductDialog').show()">
+                                                 oncomplete="PF('deleteInstrumentDialog').show()">
                                     <f:setPropertyActionListener value="#{instrument}" target="#{instrumentBean.selectedInstrument}" />
                                 </p:commandButton>
                             </p:column>
@@ -79,7 +81,7 @@
                     </h:form>
 
                    <h:form id="dialogs">
-                        <p:dialog header="Product Details" showEffect="fade" modal="true" widgetVar="manageProductDialog"
+                        <p:dialog header="Product Details" showEffect="fade" modal="true" widgetVar="manageInstrumentDialog"
                                   responsive="true">
                             <p:outputPanel id="manage-product-content" class="ui-fluid">
                                 <p:outputPanel rendered="#{not empty instrumentBean.selectedInstrument}">
@@ -87,24 +89,34 @@
                                         <p:outputLabel for="name">Name</p:outputLabel>
                                         <p:inputText id="name" value="#{instrumentBean.selectedInstrument.instrumentLibelle}" required="true" />
                                     </div>
+                                    <div class="field">
+                                        <p:outputLabel for="familles">Familles</p:outputLabel>
+                                        <p:selectManyMenu id="familles" value="#{instrumentBean.selectedFamilles}"
+                                                          layout="responsive" columns="2" filter="true" filterMatchMode="contains" showCheckbox="true" required="true">
+                                            <f:selectItems value="#{instrumentBean.familleList}" var="famille" itemLabel="#{famille}" itemValue="#{famille}"/>
+                                        </p:selectManyMenu>
+                                    </div>
+                                    <div class="field">
+                                        #{instrumentBean.selectedFamilles}
+                                    </div>
                                 </p:outputPanel>
                             </p:outputPanel>
 
                             <f:facet name="footer">
                                 <p:commandButton value="Save" icon="pi pi-check" actionListener="#{instrumentBean.saveInstrument}"
-                                                 update="manage-product-content" process="manage-product-content @this" />
-                                <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageProductDialog').hide()"
+                                                 process="manage-product-content @this" update=":form:dt-instruments" />
+                                <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageInstrumentDialog').hide()"
                                                  class="ui-button-secondary" type="button" />
                             </f:facet>
                         </p:dialog>
 
-                        <p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade" width="300"
-                                         message="Delete the product?" header="Confirm" severity="warn">
-                            <p:commandButton value="Yes" icon="pi pi-check"
-                                             process="@this" update=":form:delete-products-button"
-                                             oncomplete="PF('deleteProductDialog').hide()" />
-                            <p:commandButton value="No" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
-                                             onclick="PF('deleteProductDialog').hide()" />
+                        <p:confirmDialog widgetVar="deleteInstrumentDialog" showEffect="fade" width="300"
+                                         message="Supprimer l'instrument?" header="Confirm" severity="warn">
+                            <p:commandButton value="Oui" icon="pi pi-check"
+                                             process="@this" update=":form:dt-instruments"
+                                             oncomplete="PF('deleteInstrumentDialog').hide()" actionListener="#{instrumentBean.deleteInstrument}"/>
+                            <p:commandButton value="Non" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                             onclick="PF('deleteInstrumentDialog').hide()" />
                         </p:confirmDialog>
 
                         <p:confirmDialog global="true" showEffect="fade" width="300">

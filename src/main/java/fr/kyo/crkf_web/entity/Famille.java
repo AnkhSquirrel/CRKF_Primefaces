@@ -18,19 +18,19 @@ public class Famille {
         return familleId;
     }
 
-    public String getfamille() {
+    public String getFamilleLibelle() {
         return familleLibelle;
     }
 
-    public void setfamille(String famille) {
+    public void setFamilleLibelle(String famille) {
         this.familleLibelle = famille;
     }
 
-    public Classification getclassification() {
+    public Classification getClassification() {
         return DAOFactory.getClassificationDAO().getByID(classificationId);
     }
 
-    public void setclassification(Classification classification) {
+    public void setClassification(Classification classification) {
         this.classificationId = classification.getClassificationId();
     }
 

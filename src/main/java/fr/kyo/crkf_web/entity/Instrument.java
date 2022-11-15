@@ -15,6 +15,12 @@ public class Instrument {
         familles = new ArrayList<>();
     }
 
+    public Instrument() {
+        instrumentId = 0;
+        instrumentLibelle = "";
+        familles = new ArrayList<>();
+    }
+
     public int getInstrumentId() {
         return instrumentId;
     }
@@ -28,13 +34,15 @@ public class Instrument {
     }
 
     public List<Famille> getFamilles() {
-        ArrayList<Famille> list = new ArrayList<>();
+        List<Famille> list = new ArrayList<>();
         for(int i : familles)
             list.add(DAOFactory.getFamilleDAO().getByID(i));
         return list;
     }
-    public void setFamilles(List<Integer> familles){
-        this.familles = familles;
+    public void setFamilles(List<Famille> newFamille){
+        familles.clear();
+        for(Famille famille : newFamille)
+            familles.add(famille.getFamilleId());
     }
     public void addFamille(Famille famille){
         familles.add(famille.getFamilleId());

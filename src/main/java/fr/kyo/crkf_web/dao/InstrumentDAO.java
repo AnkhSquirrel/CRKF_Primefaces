@@ -148,4 +148,30 @@ public class InstrumentDAO extends DAO<Instrument> {
         }
     }
 
+    public boolean deleteAll(List<Instrument> instrumentList) {
+        try{
+            for(Instrument object : instrumentList){
+                String requete = "DELETE FROM Instrument_Famille WHERE id_instrument=?";
+                try (PreparedStatement preparedStatement2 = connection.prepareStatement(requete)){
+                    connection.setAutoCommit(false);
+                    preparedStatement2.setInt(1, object.getInstrumentId());
+                    preparedStatement2.executeUpdate();
+                }
+                String requete2 = "DELETE FROM Instrument WHERE id_instrument=?";
+                try (PreparedStatement preparedStatement = connection.prepareStatement(requete2)){
+                    preparedStatement.setInt(1, object.getInstrumentId());
+                    preparedStatement.executeUpdate();
+                }
+                connection.commit();
+            }
+        } catch(SQLException e) {
+            try {
+                connection.rollback();
+                return false;
+            } catch (SQLException e2) {
+                e2.printStackTrace();
+            }
+        }
+        return true;
+    }
 }
