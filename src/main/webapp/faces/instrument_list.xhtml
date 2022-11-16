@@ -21,9 +21,9 @@
                         <p:toolbar>
                             <p:toolbarGroup>
                                 <p:commandButton value="Nouveau" icon="pi pi-plus" actionListener="#{instrumentBean.newInstrument}"
-                                                 update=":dialogs:manage-product-content" oncomplete="PF('manageInstrumentDialog').show()"
+                                                 update=":dialogs:manage-instrument-content" oncomplete="PF('manageInstrumentDialog').show()"
                                                  styleClass="ui-button-success" style="margin-right: .5rem">
-                                    <p:resetInput target=":dialogs:manage-product-content" />
+                                    <p:resetInput target=":dialogs:manage-instrument-content" />
                                 </p:commandButton>
                                 <p:commandButton id="delete-instruments-button"
                                                  icon="pi pi-trash"
@@ -63,12 +63,12 @@
                                 <h:outputText value="#{instrument.instrumentLibelle}" />
                             </p:column>
                             <p:column exportable="false">
-                                <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-product-content"
+                                <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-instrument-content"
                                                  oncomplete="PF('manageInstrumentDialog').show()"
                                                  styleClass="edit-button rounded-button ui-button-success" process="@this">
                                     <f:setPropertyActionListener value="#{instrument.familles}" target="#{instrumentBean.selectedFamilles}"/>
                                     <f:setPropertyActionListener value="#{instrument}" target="#{instrumentBean.selectedInstrument}"  />
-                                    <p:resetInput target=":dialogs:manage-product-content" />
+                                    <p:resetInput target=":dialogs:manage-instrument-content" />
                                 </p:commandButton>
                                 <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
                                                  process="@this"
@@ -81,9 +81,9 @@
                     </h:form>
 
                    <h:form id="dialogs">
-                        <p:dialog header="Product Details" showEffect="fade" modal="true" widgetVar="manageInstrumentDialog"
+                        <p:dialog header="Details Instrument" showEffect="fade" modal="true" widgetVar="manageInstrumentDialog"
                                   responsive="true">
-                            <p:outputPanel id="manage-product-content" class="ui-fluid">
+                            <p:outputPanel id="manage-instrument-content" class="ui-fluid">
                                 <p:outputPanel rendered="#{not empty instrumentBean.selectedInstrument}">
                                     <div class="field">
                                         <p:outputLabel for="name">Name</p:outputLabel>
@@ -103,9 +103,9 @@
                             </p:outputPanel>
 
                             <f:facet name="footer">
-                                <p:commandButton value="Save" icon="pi pi-check" actionListener="#{instrumentBean.saveInstrument}"
-                                                 process="manage-product-content @this" update=":form:dt-instruments" />
-                                <p:commandButton value="Cancel" icon="pi pi-times" onclick="PF('manageInstrumentDialog').hide()"
+                                <p:commandButton value="Enregistrer" icon="pi pi-check" actionListener="#{instrumentBean.saveInstrument}"
+                                                 process="manage-instrument-content @this" update=":form:dt-instruments" />
+                                <p:commandButton value="Annulée" icon="pi pi-times" onclick="PF('manageInstrumentDialog').hide()"
                                                  class="ui-button-secondary" type="button" />
                             </f:facet>
                         </p:dialog>
@@ -120,8 +120,8 @@
                         </p:confirmDialog>
 
                         <p:confirmDialog global="true" showEffect="fade" width="300">
-                            <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
-                            <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"
+                            <p:commandButton value="Oui" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                            <p:commandButton value="Non" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"
                                              icon="pi pi-times" />
                         </p:confirmDialog>
                     </h:form>

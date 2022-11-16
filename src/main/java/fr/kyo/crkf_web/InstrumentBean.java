@@ -86,6 +86,7 @@ public class InstrumentBean implements Serializable {
 
     public void newInstrument(){
         selectedInstrument = new Instrument();
+        selectedFamilles.clear();
     }
 
     public List<Instrument> getInstrumentList() {
