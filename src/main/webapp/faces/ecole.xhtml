@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      lang="fr">
+<f:view>
+    <h:body>
+        <ui:composition template="templates/layout.xhtml"
+                        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                        xmlns:h="http://xmlns.jcp.org/jsf/html">
+            <ui:define name="title">Ecole - CRKF</ui:define>
+            <ui:define name="content">
+
+                <div class="card-ecole">
+                    <h:form id="form">
+                        <p:growl id="messages" showDetail="true" />
+
+                        <p:toolbar>
+                            <p:toolbarGroup>
+                                <p:commandButton value="Créer une école" icon="pi pi-plus" actionListener="#{ecoleBean.newEcole()}"
+                                                 update=":dialogs:manage-ecole-content" oncomplete="PF('manageEcoleDialog').show()"
+                                                 styleClass="ui-button-success" style="margin-right: .5rem">
+                                    <p:resetInput target=":dialogs:manage-ecole-content" />
+                                </p:commandButton>
+                                <p:commandButton id="delete-ecole-button" value="#{ecoleBean.deleteButtonMessage}"
+                                                 icon="pi pi-trash" actionListener="#{ecoleBean.deleteSelectedEcoles()}"
+                                                 styleClass="ui-button-danger" disabled="#{!ecoleBean.hasSelectedEcoles()}" update="@this">
+                                    <p:confirm header="Confirmation" message="Supprimer la ou les écoles sélectionnée(s) ?"
+                                               icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+                            </p:toolbarGroup>
+                        </p:toolbar>
+
+                        <p:dataTable id="dt-ecole" widgetVar="dtEcole" var="ecole" value="#{ecoleBean.allEcole}"
+                                     reflow="true" styleClass="ecole-table" selection="#{ecoleBean.selectedEcoles}"
+                                     rowKey="#{ecole.ecoleId}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+                            <f:facet name="header">
+                                <div class="ecole-table-header">
+                                    <span style="font-weight: bold">Ecoles : </span>
+                                    <span class="filter-container ui-input-icon-left">
+                                        <i class="pi pi-search"></i>
+                        <p:inputText id="globalFilter" onkeyup="PF('dtEcole').filter()" placeholder="Rechercher..." />
+                    </span>
+                                </div>
+                            </f:facet>
+
+                            <p:ajax event="rowSelect" update=":form:delete-ecole-button" />
+                            <p:ajax event="rowUnselect" update=":form:delete-ecole-button" />
+                            <p:ajax event="rowSelectCheckbox" update=":form:delete-ecole-button" />
+                            <p:ajax event="rowUnselectCheckbox" update=":form:delete-ecole-button" />
+                            <p:ajax event="toggleSelect" update=":form:delete-ecole-button" />
+
+                            <p:column selectionMode="multiple" exportable="false"></p:column>
+
+                            <p:column headerText="Nom" sortBy="#{ecole.ecoleNom}">
+                                <h:outputText value="#{ecole.ecoleNom}" />
+                            </p:column>
+                            <p:column headerText="Adresse" sortBy="#{ecole.ecoleAdresse}">
+                                <h:outputText value="#{ecole.ecoleAdresse}" />
+                            </p:column>
+                            <p:column headerText="Département" sortBy="#{ecole.ecoleAdresse.ville.departement}">
+                                <h:outputText value="#{ecole.ecoleAdresse.ville.departement}" />
+                            </p:column>
+                            <p:column headerText="Ville" sortBy="#{ecole.ecoleAdresse.ville}">
+                                <h:outputText value="#{ecole.ecoleAdresse.ville}" />
+                            </p:column>
+                            <p:column exportable="false">
+                                <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-ecole-content"
+                                                 oncomplete="PF('manageEcoleDialog').show()"
+                                                 styleClass="edit-button rounded-button ui-button-success" process="@this">
+                                    <f:setPropertyActionListener value="#{ecole}" target="#{ecoleBean.selectedEcole}" />
+                                    <p:resetInput target=":dialogs:manage-ecole-content" />
+                                </p:commandButton>
+                                <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
+                                                 process="@this"
+                                                 oncomplete="PF('deleteEcoleDialog').show()">
+                                    <f:setPropertyActionListener value="#{ecole}" target="#{ecoleBean.selectedEcole}" />
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                    </h:form>
+
+                    <h:form id="dialogs">
+                        <p:dialog header="Détails" showEffect="fade" modal="true" widgetVar="manageEcoleDialog"
+                                  responsive="true">
+                            <p:outputPanel id="manage-ecole-content" class="ui-fluid">
+                                <p:outputPanel rendered="#{not empty ecoleBean.selectedEcole}">
+                                    <div class="field">
+                                        <p:outputLabel for="name">Nom</p:outputLabel>
+                                        <p:inputText id="name" value="#{ecoleBean.selectedEcole.ecoleNom}" required="true" />
+                                    </div>
+                                    <div class="field">
+                                        <p:outputLabel for="name">Adresse</p:outputLabel>
+                                        <p:inputText id="adresse" value="#{ecoleBean.selectedEcole.ecoleAdresse}" required="true" />
+                                    </div>
+                                    <div class="field">
+                                        <p:outputLabel for="name">Département</p:outputLabel>
+                                        <p:inputText id="departement" value="#{ecoleBean.selectedEcole.ecoleAdresse.ville}" required="true" />
+                                    </div>
+                                    <div class="field">
+                                        <p:outputLabel for="name">Ville</p:outputLabel>
+                                        <p:inputText id="ville" value="#{ecoleBean.selectedEcole.ecoleAdresse.ville.departement}" required="true" />
+                                    </div>
+                                </p:outputPanel>
+                            </p:outputPanel>
+
+                            <f:facet name="footer">
+                                <p:commandButton value="Enregistrer" icon="pi pi-check" actionListener="#{ecoleBean.saveEcole()}"
+                                                 update=":form:dt-ecole" process="manage-ecole-content @this" />
+                                <p:commandButton value="Annuler" icon="pi pi-times" onclick="PF('manageEcoleDialog').hide()"
+                                                 class="ui-button-secondary" type="button" />
+                            </f:facet>
+                        </p:dialog>
+
+                        <p:confirmDialog widgetVar="deleteEcoleDialog" showEffect="fade" width="300"
+                                         message="Voulez-vous supprimer cette école ?" header="Suppression" severity="warn">
+                            <p:commandButton value="Oui" icon="pi pi-check" actionListener="#{ecoleBean.deleteSelectedEcole()}"
+                                             process="@this" update=":form:delete-ecole-button"
+                                             oncomplete="PF('deleteEcoleDialog').hide()" />
+                            <p:commandButton value="Non" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                             onclick="PF('deleteEcoleDialog').hide()" />
+                        </p:confirmDialog>
+
+                        <p:confirmDialog global="true" showEffect="fade" width="300">
+                            <p:commandButton value="Oui" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                            <p:commandButton value="Non" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"
+                                             icon="pi pi-times" />
+                        </p:confirmDialog>
+                    </h:form>
+                </div>
+
+
+
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</f:view>
+</html>
