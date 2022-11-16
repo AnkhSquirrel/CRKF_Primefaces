@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      lang="fr">
+<f:view>
+    <h:body>
+        <ui:composition template="templates/layout.xhtml"
+                        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                        xmlns:h="http://xmlns.jcp.org/jsf/html">
+            <ui:define name="title">Instrument - CRKF</ui:define>
+            <ui:define name="content">
+                <div class="card crud-demo">
+                    <h:form id="form">
+                        <p:growl id="messages" showDetail="true" />
+
+                        <p:toolbar>
+                            <p:toolbarGroup>
+                                <p:commandButton value="Nouveau" icon="pi pi-plus" actionListener="#{instrumentBean.newInstrument}"
+                                                 update=":dialogs:manage-instrument-content" oncomplete="PF('manageInstrumentDialog').show()"
+                                                 styleClass="ui-button-success" style="margin-right: .5rem">
+                                    <p:resetInput target=":dialogs:manage-instrument-content" />
+                                </p:commandButton>
+                                <p:commandButton id="delete-instruments-button"
+                                                 icon="pi pi-trash"
+                                                 styleClass="ui-button-danger" update="@this"
+                                                 actionListener="#{instrumentBean.deleteInstruments}">
+                                    <p:confirm header="Confirmation" message="Supprimer les instruments selectionner?"
+                                               icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+                            </p:toolbarGroup>
+                        </p:toolbar>
+
+                        <p:dataTable id="dt-instruments" widgetVar="dtInstrument" var="instrument" value="#{instrumentBean.instrumentList}"
+                                     reflow="true" styleClass="products-table" selection="#{instrumentBean.selectedInstruments}"
+                                     rowKey="#{instrument.instrumentId}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+
+                            <f:facet name="header">
+                                <div class="products-table-header">
+                                    <span style="font-weight: bold">INSTRUMENT</span>
+                                    <span class="filter-container ui-input-icon-left"> <i class="pi pi-search"></i>
+                                        <p:inputText id="globalFilter" onkeyup="PF('dtInstrument').filter()" placeholder="Search" />
+                                    </span>
+                                </div>
+                            </f:facet>
+
+                            <p:ajax event="rowSelect" update=":form:delete-instruments-button" />
+                            <p:ajax event="rowUnselect" update=":form:delete-instruments-button" />
+                            <p:ajax event="rowSelectCheckbox" update=":form:delete-instruments-button" />
+                            <p:ajax event="rowUnselectCheckbox" update=":form:delete-instruments-button" />
+                            <p:ajax event="toggleSelect" update=":form:delete-instruments-button" />
+
+                            <p:column selectionMode="multiple" exportable="false"></p:column>
+
+                            <p:column headerText="Id" sortBy="#{instrument.instrumentId}" filterBy="#{instrument.instrumentId}">
+                                <h:outputText value="#{instrument.instrumentId}" />
+                            </p:column>
+                            <p:column headerText="Libelle" sortBy="#{instrument.instrumentLibelle}" filterBy="#{instrument.instrumentLibelle}">
+                                <h:outputText value="#{instrument.instrumentLibelle}" />
+                            </p:column>
+                            <p:column exportable="false">
+                                <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-instrument-content"
+                                                 oncomplete="PF('manageInstrumentDialog').show()"
+                                                 styleClass="edit-button rounded-button ui-button-success" process="@this">
+                                    <f:setPropertyActionListener value="#{instrument}" target="#{instrumentBean.selectedInstrument}"  />
+                                    <p:resetInput target=":dialogs:manage-instrument-content" />
+                                </p:commandButton>
+                                <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
+                                                 process="@this"
+                                                 oncomplete="PF('deleteInstrumentDialog').show()">
+                                    <f:setPropertyActionListener value="#{instrument}" target="#{instrumentBean.selectedInstrument}" />
+                                </p:commandButton>
+                            </p:column>
+
+                        </p:dataTable>
+                    </h:form>
+
+                   <h:form id="dialogs">
+                        <p:dialog header="Details Instrument" showEffect="fade" modal="true" widgetVar="manageInstrumentDialog"
+                                  responsive="true">
+                            <p:outputPanel id="manage-instrument-content" class="ui-fluid">
+                                <p:outputPanel rendered="#{not empty instrumentBean.selectedInstrument}">
+                                    <div class="field">
+                                        <p:outputLabel for="name">Name</p:outputLabel>
+                                        <p:inputText id="name" value="#{instrumentBean.selectedInstrument.instrumentLibelle}" required="true" />
+                                    </div>
+                                    <div class="field">
+                                        <p:outputLabel for="familles">Familles</p:outputLabel>
+                                        <p:selectManyMenu id="familles" value="#{instrumentBean.selectedInstrument.familles}"
+                                                          layout="responsive" columns="2" filter="true" filterMatchMode="contains" showCheckbox="true" required="true">
+                                            <f:selectItems value="#{instrumentBean.familleList}" var="famille" itemLabel="#{famille.familleLibelle}" itemValue="#{famille.familleId}"/>
+                                        </p:selectManyMenu>
+                                    </div>
+                                </p:outputPanel>
+                            </p:outputPanel>
+
+                            <f:facet name="footer">
+                                <p:commandButton value="Enregistrer" icon="pi pi-check" actionListener="#{instrumentBean.saveInstrument}"
+                                                 process="manage-instrument-content @this" update=":form:dt-instruments" />
+                                <p:commandButton value="Annulée" icon="pi pi-times" onclick="PF('manageInstrumentDialog').hide()"
+                                                 class="ui-button-secondary" type="button" />
+                            </f:facet>
+                        </p:dialog>
+
+                        <p:confirmDialog widgetVar="deleteInstrumentDialog" showEffect="fade" width="300"
+                                         message="Supprimer l'instrument?" header="Confirm" severity="warn">
+                            <p:commandButton value="Oui" icon="pi pi-check"
+                                             process="@this" update=":form:dt-instruments"
+                                             oncomplete="PF('deleteInstrumentDialog').hide()" actionListener="#{instrumentBean.deleteInstrument}"/>
+                            <p:commandButton value="Non" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                             onclick="PF('deleteInstrumentDialog').hide()" />
+                        </p:confirmDialog>
+
+                        <p:confirmDialog global="true" showEffect="fade" width="300">
+                            <p:commandButton value="Oui" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                            <p:commandButton value="Non" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"
+                                             icon="pi pi-times" />
+                        </p:confirmDialog>
+                    </h:form>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</f:view>
+</html>
