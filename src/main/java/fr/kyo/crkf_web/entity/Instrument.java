@@ -33,17 +33,21 @@ public class Instrument {
         this.instrumentLibelle = instrumentLibelle;
     }
 
-    public List<Famille> getFamilles() {
+    public List<Famille> getFamillesObject() {
         List<Famille> list = new ArrayList<>();
         for(int i : familles)
             list.add(DAOFactory.getFamilleDAO().getByID(i));
         return list;
     }
-    public void setFamilles(List<Famille> newFamille){
-        familles.clear();
-        for(Famille famille : newFamille)
-            familles.add(famille.getFamilleId());
+
+    public List<Integer> getFamilles() {
+        return familles;
     }
+
+    public void setFamilles(List<Integer> familles) {
+        this.familles = familles;
+    }
+
     public void addFamille(Famille famille){
         familles.add(famille.getFamilleId());
     }

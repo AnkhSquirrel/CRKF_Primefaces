@@ -22,7 +22,6 @@ public class InstrumentBean implements Serializable {
     private Instrument selectedInstrument;
 
     private List<Famille> familleList;
-    private List<Famille> selectedFamilles;
 
     @PostConstruct
     private void init(){
@@ -36,9 +35,6 @@ public class InstrumentBean implements Serializable {
 
     public void saveInstrument() {
         if (this.selectedInstrument.getInstrumentId() == 0) {
-            for(Famille famille : selectedFamilles){
-                selectedInstrument.addFamille(famille);
-            }
             if(DAOFactory.getInstrumentDAO().insert(selectedInstrument) != 0){
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Instrument Ajouter"));
             }else{
@@ -46,8 +42,6 @@ public class InstrumentBean implements Serializable {
             }
         }
         else {
-            selectedInstrument.getFamilles().clear();
-            selectedInstrument.setFamilles(selectedFamilles);
             if(DAOFactory.getInstrumentDAO().update(selectedInstrument)){
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Instrument Modifier"));
             }else{
@@ -86,7 +80,6 @@ public class InstrumentBean implements Serializable {
 
     public void newInstrument(){
         selectedInstrument = new Instrument();
-        selectedFamilles.clear();
     }
 
     public List<Instrument> getInstrumentList() {
@@ -119,13 +112,5 @@ public class InstrumentBean implements Serializable {
 
     public void setFamilleList(List<Famille> familleList) {
         this.familleList = familleList;
-    }
-
-    public List<Famille> getSelectedFamilles() {
-        return selectedFamilles;
-    }
-
-    public void setSelectedFamilles(List<Famille> selectedFamilles) {
-        this.selectedFamilles = selectedFamilles;
     }
 }

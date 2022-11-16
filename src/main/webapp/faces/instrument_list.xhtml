@@ -66,7 +66,6 @@
                                 <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-instrument-content"
                                                  oncomplete="PF('manageInstrumentDialog').show()"
                                                  styleClass="edit-button rounded-button ui-button-success" process="@this">
-                                    <f:setPropertyActionListener value="#{instrument.familles}" target="#{instrumentBean.selectedFamilles}"/>
                                     <f:setPropertyActionListener value="#{instrument}" target="#{instrumentBean.selectedInstrument}"  />
                                     <p:resetInput target=":dialogs:manage-instrument-content" />
                                 </p:commandButton>
@@ -91,13 +90,10 @@
                                     </div>
                                     <div class="field">
                                         <p:outputLabel for="familles">Familles</p:outputLabel>
-                                        <p:selectManyMenu id="familles" value="#{instrumentBean.selectedFamilles}"
+                                        <p:selectManyMenu id="familles" value="#{instrumentBean.selectedInstrument.familles}"
                                                           layout="responsive" columns="2" filter="true" filterMatchMode="contains" showCheckbox="true" required="true">
-                                            <f:selectItems value="#{instrumentBean.familleList}" var="famille" itemLabel="#{famille}" itemValue="#{famille}"/>
+                                            <f:selectItems value="#{instrumentBean.familleList}" var="famille" itemLabel="#{famille.familleLibelle}" itemValue="#{famille.familleId}"/>
                                         </p:selectManyMenu>
-                                    </div>
-                                    <div class="field">
-                                        #{instrumentBean.selectedFamilles}
                                     </div>
                                 </p:outputPanel>
                             </p:outputPanel>
