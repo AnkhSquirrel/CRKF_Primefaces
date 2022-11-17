@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  db:
+    container_name: CRKF_DB
+    image: ankhsquirrel/crkf
+    ports:
+      - "1433:1433"
+  web:
+    container_name: CRKF_APP
+    image: orelienthomas/crkf_webapp
+    ports:
+      - "8080:8080"
