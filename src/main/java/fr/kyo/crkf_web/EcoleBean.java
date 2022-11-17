@@ -1,7 +1,8 @@
 package fr.kyo.crkf_web;
 
 import fr.kyo.crkf_web.dao.DAOFactory;
-import fr.kyo.crkf_web.dao.EcoleDAO;
+import fr.kyo.crkf_web.entity.Adresse;
+import fr.kyo.crkf_web.entity.Departement;
 import fr.kyo.crkf_web.entity.Ecole;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
@@ -19,14 +20,22 @@ public class EcoleBean implements Serializable {
     private static List<Ecole> allEcole;
     private transient Ecole selectedEcole;
     private transient List<Ecole> selectedEcoles;
+    private transient List<Adresse> adresseList;
+    private transient List<Departement> departementList;
+    private String query;
 
     @PostConstruct
     private void init(){
         allEcole = DAOFactory.getEcoleDAO().getAll(0);
+        adresseList = DAOFactory.getAdresseDAO().getLike("");
+        departementList = DAOFactory.getDepartementDAO().getAll(0);
     }
 
     private void refresh(){
         allEcole = DAOFactory.getEcoleDAO().getAll(0);
+    }
+    public void refreshAdresseList(){
+        adresseList = DAOFactory.getAdresseDAO().getLike(query);
     }
 
     public void newEcole() {
@@ -115,5 +124,29 @@ public class EcoleBean implements Serializable {
 
     public void setSelectedEcoles(List<Ecole> selectedEcoles) {
         this.selectedEcoles = selectedEcoles;
+    }
+
+    public List<Adresse> getAdresseList() {
+        return adresseList;
+    }
+
+    public void setAdresseList(List<Adresse> adresseList) {
+        this.adresseList = adresseList;
+    }
+
+    public String getQuery() {
+        return query;
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
+    }
+
+    public List<Departement> getDepartementList() {
+        return departementList;
+    }
+
+    public void setDepartementList(List<Departement> departementList) {
+        this.departementList = departementList;
     }
 }

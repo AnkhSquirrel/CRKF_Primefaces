@@ -93,17 +93,27 @@
                                         <p:outputLabel for="name">Nom</p:outputLabel>
                                         <p:inputText id="name" value="#{ecoleBean.selectedEcole.ecoleNom}" required="true" />
                                     </div>
-                                    <div class="field">
-                                        <p:outputLabel for="name">Adresse</p:outputLabel>
-                                        <p:inputText id="adresse" value="#{ecoleBean.selectedEcole.ecoleAdresse}" required="true" />
-                                    </div>
+
+                                    <p:outputLabel for="adresse">Adresse</p:outputLabel>
+
+                                    <p:inputText id="adresse" value="#{ecoleBean.query}" >
+                                        <p:ajax event="keyup" update="adresseCombo" listener="#{ecoleBean.refreshAdresseList}"/>
+                                    </p:inputText>
+
+                                    <p:selectOneMenu id="adresseCombo" value="#{ecoleBean.selectedEcole.ecoleAdresse}" effect="fade" required="true">
+                                        <f:selectItems value="#{ecoleBean.adresseList}" var="address" itemLabel="#{address.adresseLibelle}" itemValue="#{address.adresseId}"/>
+                                    </p:selectOneMenu>
+
                                     <div class="field">
                                         <p:outputLabel for="name">Département</p:outputLabel>
-                                        <p:inputText id="departement" value="#{ecoleBean.selectedEcole.ecoleAdresse.ville}" required="true" />
+
+                                        <p:selectOneMenu id="departementCombo" value="#{ecoleBean.selectedEcole.ecoleAdresse.ville.departement}" effect="fade" required="true">
+                                            <f:selectItems value="#{ecoleBean.departementList}" var="departement" itemLabel="#{departement.departementLibelle}" itemValue="#{departement.departementId}"/>
+                                        </p:selectOneMenu>
                                     </div>
                                     <div class="field">
                                         <p:outputLabel for="name">Ville</p:outputLabel>
-                                        <p:inputText id="ville" value="#{ecoleBean.selectedEcole.ecoleAdresse.ville.departement}" required="true" />
+                                        <p:inputText id="ville" value="#{ecoleBean.selectedEcole.ecoleAdresse.ville}" required="true" />
                                     </div>
                                 </p:outputPanel>
                             </p:outputPanel>

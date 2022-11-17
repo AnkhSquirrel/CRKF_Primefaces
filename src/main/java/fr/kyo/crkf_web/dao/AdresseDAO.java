@@ -29,9 +29,22 @@ public class AdresseDAO extends DAO<Adresse> {
     @Override
     public List<Adresse> getAll(int page) {
         List<Adresse> liste = new ArrayList<>();
-        String strCmd = "SELECT id_adresse, adresse, id_ville from Adresse order by adresse OFFSET " + LG_PAGE + " * (? - 1)  ROWS FETCH NEXT " + LG_PAGE + " ROWS ONLY";
+        // String strCmd = "SELECT id_adresse, adresse, id_ville from Adresse order by adresse OFFSET " + LG_PAGE + " * (? - 1)  ROWS FETCH NEXT " + LG_PAGE + " ROWS ONLY";
+        String strCmd = "SELECT id_adresse, adresse, id_ville from Adresse order by adresse";
         try (PreparedStatement preparedStatement = connection.prepareStatement(strCmd)){
-            preparedStatement.setInt(1,page);
+            // preparedStatement.setInt(1,page);
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) liste.add(new Adresse(rs.getInt(1), rs.getString(2),rs.getInt(3)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return liste;
+    }
+
+    public List<Adresse> getLike(String query) {
+        List<Adresse> liste = new ArrayList<>();
+        StringBuilder strCmd = new StringBuilder("SELECT top 10 id_adresse, adresse, id_ville from Adresse WHERE adresse LIKE '%").append(query).append("%' order by adresse");
+        try (PreparedStatement preparedStatement = connection.prepareStatement(strCmd.toString())){
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) liste.add(new Adresse(rs.getInt(1), rs.getString(2),rs.getInt(3)));
         } catch (Exception e) {

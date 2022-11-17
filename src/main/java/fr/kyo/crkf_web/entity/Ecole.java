@@ -5,7 +5,7 @@ import fr.kyo.crkf_web.dao.DAOFactory;
 public class Ecole {
 
     private final int ecoleId;
-    private final String ecoleNom;
+    private String ecoleNom;
     private final int ecoleAdresse;
 
     public Ecole(int ecoleId, String ecoleNom ,int ecoleAdresse) {
@@ -28,6 +28,9 @@ public class Ecole {
 
     public String getEcoleNom() {
         return ecoleNom;
+    }
+    public void setEcoleNom(String ecoleNom) {
+        this.ecoleNom = ecoleNom;
     }
 
     @Override
