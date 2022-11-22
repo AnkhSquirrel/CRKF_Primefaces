@@ -7,3 +7,5 @@ O
 -src/main/webapp/faces/templates/content.xhtml,8\e\8ea44c64df7de2ecc64c6d3ff76cf388db854784
 \
 ,src/main/webapp/faces/templates/header.xhtml,1\6\166196c9a9f48bf22942b431442f49f25489f560
+c
+3src/main/java/fr/kyo/crkf_web/URLRewriterClass.java,4\5\45e3d1ca1c2b20307faebeb2e6b7e6a7d279da49

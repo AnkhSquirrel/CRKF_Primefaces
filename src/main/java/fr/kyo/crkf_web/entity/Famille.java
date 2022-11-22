@@ -4,7 +4,7 @@ import fr.kyo.crkf_web.dao.DAOFactory;
 
 public class Famille {
 
-    private final int familleId;
+    private int familleId;
     private String familleLibelle;
     private int classificationId;
 
@@ -12,6 +12,10 @@ public class Famille {
         this.familleId = familleId;
         this.familleLibelle = familleLibelle;
         this.classificationId = classificationId;
+    }
+
+    public void setFamilleId(int familleId) {
+        this.familleId = familleId;
     }
 
     public int getFamilleId() {
@@ -22,20 +26,24 @@ public class Famille {
         return familleLibelle;
     }
 
-    public void setFamilleLibelle(String famille) {
-        this.familleLibelle = famille;
-    }
-
-    public Classification getClassification() {
-        return DAOFactory.getClassificationDAO().getByID(classificationId);
-    }
-
-    public void setClassification(Classification classification) {
-        this.classificationId = classification.getClassificationId();
+    public void setFamilleLibelle(String familleLibelle) {
+        this.familleLibelle = familleLibelle;
     }
 
     public int getClassificationId() {
         return classificationId;
+    }
+
+    public void setClassificationId(int classificationId) {
+        this.classificationId = classificationId;
+    }
+
+    public Classification getClassificationObject() {
+        return DAOFactory.getClassificationDAO().getByID(classificationId);
+    }
+
+    public void setClassificationObject(Classification classification) {
+        this.classificationId = classification.getClassificationId();
     }
 
     @Override

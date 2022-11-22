@@ -1,6 +1,7 @@
 package fr.kyo.crkf_web.dao;
 
 import fr.kyo.crkf_web.entity.Famille;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +57,7 @@ public class FamilleDAO extends DAO<Famille> {
         try (PreparedStatement  preparedStatement = connection.prepareStatement(requete, Statement.RETURN_GENERATED_KEYS)) {
             connection.setAutoCommit(false);
             preparedStatement.setString( 1 , objet.getFamilleLibelle());
-            preparedStatement.setInt(2, objet.getClassification().getClassificationId());
+            preparedStatement.setInt(2, objet.getClassificationObject().getClassificationId());
             preparedStatement.executeUpdate();
             ResultSet rs = preparedStatement.getGeneratedKeys();
             if(rs.next()) return rs.getInt(1);
@@ -77,7 +78,7 @@ public class FamilleDAO extends DAO<Famille> {
         try (PreparedStatement preparedStatement = connection.prepareStatement(requete)){
             connection.setAutoCommit(false);
             preparedStatement.setString(1, object.getFamilleLibelle());
-            preparedStatement.setInt(2, object.getClassification().getClassificationId());
+            preparedStatement.setInt(2, object.getClassificationObject().getClassificationId());
             preparedStatement.setInt(3, object.getFamilleId());
             preparedStatement.executeUpdate();
             connection.commit();
@@ -111,4 +112,25 @@ public class FamilleDAO extends DAO<Famille> {
         return false;
     }
 
+    public boolean deleteAll(List<Famille> familleList) {
+        try{
+            connection.setAutoCommit(false);
+            for(Famille object : familleList){
+                String requete = "DELETE FROM Famille WHERE id_famille=?";
+                try (PreparedStatement preparedStatement = connection.prepareStatement(requete)) {
+                    preparedStatement.setInt(1, object.getFamilleId());
+                    preparedStatement.executeUpdate();
+                }
+                connection.commit();
+            }
+        } catch(SQLException e) {
+            try {
+                connection.rollback();
+                return false;
+            } catch (SQLException e2) {
+                e2.printStackTrace();
+            }
+        }
+        return true;
+    }
 }
