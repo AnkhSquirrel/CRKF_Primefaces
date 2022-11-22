@@ -20,7 +20,7 @@
 
                         <p:toolbar>
                             <p:toolbarGroup>
-                                <p:commandButton value="Nouveau" icon="pi pi-plus" actionListener="#{instrumentBean.newInstrument}"
+                                <p:commandButton value="Nouveau" icon="pi pi-plus" actionListener="#{familleBean.newFamille}"
                                                  update=":dialogs:manage-famille-content" oncomplete="PF('manageFamilleDialog').show()"
                                                  styleClass="ui-button-success" style="margin-right: .5rem">
                                     <p:resetInput target=":dialogs:manage-famille-content" />
@@ -28,16 +28,16 @@
                                 <p:commandButton id="delete-familles-button"
                                                  icon="pi pi-trash"
                                                  styleClass="ui-button-danger" update="@this"
-                                                 actionListener="#{instrumentBean.deleteInstruments}">
+                                                 actionListener="#{familleBean.deleteFamilles}">
                                     <p:confirm header="Confirmation" message="Supprimer les familles selectionner?"
                                                icon="pi pi-exclamation-triangle" />
                                 </p:commandButton>
                             </p:toolbarGroup>
                         </p:toolbar>
 
-                        <p:dataTable id="dt-familles" widgetVar="dtFamille" var="famille" value="#{instrumentBean.instrumentList}"
-                                     reflow="true" styleClass="products-table" selection="#{instrumentBean.selectedInstruments}"
-                                     rowKey="#{instrument.instrumentId}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+                        <p:dataTable id="dt-familles" widgetVar="dtFamille" var="famille" value="#{familleBean.familleList}"
+                                     reflow="true" styleClass="products-table" selection="#{familleBean.selectedFamilles}"
+                                     rowKey="#{famille.familleId}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
 
                             <f:facet name="header">
                                 <div class="products-table-header">
@@ -56,23 +56,23 @@
 
                             <p:column selectionMode="multiple" exportable="false"></p:column>
 
-                            <p:column headerText="Id" sortBy="#{instrument.instrumentId}" filterBy="#{instrument.instrumentId}">
-                                <h:outputText value="#{instrument.instrumentId}" />
+                            <p:column headerText="Id" sortBy="#{famille.familleId}" filterBy="#{famille.familleId}">
+                                <h:outputText value="#{famille.familleId}" />
                             </p:column>
-                            <p:column headerText="Libelle" sortBy="#{instrument.instrumentLibelle}" filterBy="#{instrument.instrumentLibelle}">
-                                <h:outputText value="#{instrument.instrumentLibelle}" />
+                            <p:column headerText="Libelle" sortBy="#{famille.familleLibelle}" filterBy="#{famille.familleLibelle}">
+                                <h:outputText value="#{famille.familleLibelle}" />
                             </p:column>
                             <p:column exportable="false">
                                 <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-famille-content"
                                                  oncomplete="PF('manageFamilleDialog').show()"
                                                  styleClass="edit-button rounded-button ui-button-success" process="@this">
-                                    <f:setPropertyActionListener value="#{instrument}" target="#{instrumentBean.selectedInstrument}"  />
+                                    <f:setPropertyActionListener value="#{famille}" target="#{familleBean.selectedFamille}"  />
                                     <p:resetInput target=":dialogs:manage-famille-content" />
                                 </p:commandButton>
                                 <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
                                                  process="@this"
                                                  oncomplete="PF('deleteFamilleDialog').show()">
-                                    <f:setPropertyActionListener value="#{instrument}" target="#{instrumentBean.selectedInstrument}" />
+                                    <f:setPropertyActionListener value="#{famille}" target="#{familleBean.selectedFamille}" />
                                 </p:commandButton>
                             </p:column>
 
@@ -83,23 +83,22 @@
                         <p:dialog header="Details Famille" showEffect="fade" modal="true" widgetVar="manageFamilleDialog"
                                   responsive="true">
                             <p:outputPanel id="manage-famille-content" class="ui-fluid">
-                                <p:outputPanel rendered="#{not empty instrumentBean.selectedInstrument}">
+                                <p:outputPanel rendered="#{not empty familleBean.selectedFamille}">
                                     <div class="field">
-                                        <p:outputLabel for="name">Name</p:outputLabel>
-                                        <p:inputText id="name" value="#{instrumentBean.selectedInstrument.instrumentLibelle}" required="true" />
+                                        <p:outputLabel for="name">Nom</p:outputLabel>
+                                        <p:inputText id="name" value="#{familleBean.selectedFamille.familleLibelle}" required="true" />
                                     </div>
                                     <div class="field">
-                                        <p:outputLabel for="familles">Familles</p:outputLabel>
-                                        <p:selectManyMenu id="familles" value="#{instrumentBean.selectedInstrument.familles}"
-                                                          layout="responsive" columns="2" filter="true" filterMatchMode="contains" showCheckbox="true" required="true">
-                                            <f:selectItems value="#{instrumentBean.familleList}" var="famille" itemLabel="#{famille.familleLibelle}" itemValue="#{famille.familleId}"/>
-                                        </p:selectManyMenu>
+                                        <p:outputLabel for="classification">Classification</p:outputLabel>
+                                        <p:selectOneMenu id="classification" value="#{familleBean.selectedFamille.classificationId}" filter="true" filterMatchMode="contains" required="true">
+                                            <f:selectItems value="#{familleBean.classificationList}" var="classification" itemValue="#{classification.classificationId}" itemLabel="#{classification.classificationLibelle}"/>
+                                        </p:selectOneMenu>
                                     </div>
                                 </p:outputPanel>
                             </p:outputPanel>
 
                             <f:facet name="footer">
-                                <p:commandButton value="Enregistrer" icon="pi pi-check" actionListener="#{instrumentBean.saveInstrument}"
+                                <p:commandButton value="Enregistrer" icon="pi pi-check" actionListener="#{familleBean.saveFamille()}"
                                                  process="manage-famille-content @this" update=":form:dt-familles" />
                                 <p:commandButton value="Annulée" icon="pi pi-times" onclick="PF('manageFamilleDialog').hide()"
                                                  class="ui-button-secondary" type="button" />
@@ -110,7 +109,7 @@
                                          message="Supprimer la famille?" header="Confirm" severity="warn">
                             <p:commandButton value="Oui" icon="pi pi-check"
                                              process="@this" update=":form:dt-familles"
-                                             oncomplete="PF('deleteFamilleDialog').hide()" actionListener="#{instrumentBean.deleteInstrument}"/>
+                                             oncomplete="PF('deleteFamilleDialog').hide()" actionListener="#{familleBean.deleteFamille}"/>
                             <p:commandButton value="Non" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
                                              onclick="PF('deleteFamilleDialog').hide()" />
                         </p:confirmDialog>

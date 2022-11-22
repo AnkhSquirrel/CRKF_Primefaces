@@ -1,9 +1,7 @@
 package fr.kyo.crkf_web.entity;
 
-import fr.kyo.crkf_web.dao.DAOFactory;
-
 public class Classification {
-    private final int classificationId;
+    private int classificationId;
     private String classificationLibelle;
 
     public Classification(int classificationId, String classificationLibelle) {
@@ -13,6 +11,10 @@ public class Classification {
 
     public int getClassificationId() {
         return classificationId;
+    }
+
+    public void setClassificationId(int classificationId) {
+        this.classificationId = classificationId;
     }
 
     public String getClassificationLibelle() {

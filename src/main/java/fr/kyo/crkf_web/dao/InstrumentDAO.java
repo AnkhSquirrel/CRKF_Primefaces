@@ -46,6 +46,23 @@ public class InstrumentDAO extends DAO<Instrument> {
         return liste;
     }
 
+    public List<Instrument> getByFamille(int famille_id) {
+        List<Instrument> liste = new ArrayList<>();
+        String strCmd = "SELECT id_instrument, Nom from Instrument where id_famille = ? order by Nom";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(strCmd)) {
+            preparedStatement.setInt(1,famille_id);
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                Instrument instrument = (new Instrument(rs.getInt(1), rs.getString(2)));
+                giveFamillesToInstrument(rs.getInt(1), instrument);
+                liste.add(instrument);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return liste;
+    }
+
     @Override
     public int insert(Instrument objet) {
         int id = 0;
