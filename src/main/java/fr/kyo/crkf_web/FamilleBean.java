@@ -62,7 +62,7 @@ public class FamilleBean implements Serializable {
         if(DAOFactory.getFamilleDAO().delete(selectedFamille)){
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Famille Supprimé"));
         }else{
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Famille non Supprimé","Il y a eu une erreur lors de la suppression, les changement ont étaient annullées"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Famille non Supprimé","Il y a eu une erreur lors de la suppression, vérifiez que aucun instrument n'est lier a cette famille"));
         }
         refreshFamille();
         PrimeFaces.current().ajax().update("form:messages", "form:dt-familles");
@@ -71,13 +71,12 @@ public class FamilleBean implements Serializable {
     public void deleteFamilles(){
         if(DAOFactory.getFamilleDAO().deleteAll(selectedFamilles)){
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Instruments Supprimés",null));
+            selectedFamilles.clear();
         }else{
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Instruments non Supprimés","Il y a eu une erreur lors de la suppression, les changement ont était annullées"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Instruments non Supprimés","Il y a eu une erreur lors de la suppression, vérifiez que aucun instrument n'est lier aux famille"));
         }
         refreshFamille();
-        PrimeFaces.current().ajax().update("form:messages", "form:dt-instruments");
-
-        selectedFamilles.clear();
+        PrimeFaces.current().ajax().update("form:messages", "form:dt-familles");
     }
 
     public List<Famille> getFamilleList() {

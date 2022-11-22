@@ -114,10 +114,10 @@ public class FamilleDAO extends DAO<Famille> {
 
     public boolean deleteAll(List<Famille> familleList) {
         try{
-            connection.setAutoCommit(false);
             for(Famille object : familleList){
                 String requete = "DELETE FROM Famille WHERE id_famille=?";
                 try (PreparedStatement preparedStatement = connection.prepareStatement(requete)) {
+                    connection.setAutoCommit(false);
                     preparedStatement.setInt(1, object.getFamilleId());
                     preparedStatement.executeUpdate();
                 }
