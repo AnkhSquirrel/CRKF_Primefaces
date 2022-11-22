@@ -32,9 +32,8 @@ public class EcoleDAO extends DAO<Ecole> {
     @Override
     public List<Ecole> getAll(int page) {
         List<Ecole> liste = new ArrayList<>();
-        String requete = "SELECT id_ecole, Nom, id_adresse from Ecole order by Nom OFFSET " + LG_PAGE + " * (? -1)  ROWS FETCH NEXT " + LG_PAGE + " ROWS ONLY";
+        String requete = "SELECT id_ecole, Nom, id_adresse from Ecole order by Nom";
         try (PreparedStatement preparedStatement = connection.prepareStatement(requete)) {
-            preparedStatement.setInt(1,page);
             ResultSet rs = preparedStatement.executeQuery();
             while (rs.next()) liste.add(new Ecole(rs.getInt(1), rs.getString(2),rs.getInt(3)));
         } catch (Exception e) {
@@ -177,4 +176,35 @@ public class EcoleDAO extends DAO<Ecole> {
         }
         return false;
     }
+
+public boolean deleteSeveralsEcoles(List<Ecole> ecoles) {
+    try {
+        for (Ecole ecole: ecoles) {
+            String requete1 = "DELETE FROM Ecole WHERE id_ecole=?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(requete1)) {
+                connection.setAutoCommit(false);
+                preparedStatement.setInt(1, ecole.getEcoleId());
+                preparedStatement.executeUpdate();
+                connection.commit();
+            }
+
+            String requete2 = "DELETE FROM Personne WHERE id_personne=?";
+            try (PreparedStatement preparedStatement2 = connection.prepareStatement(requete2)) {
+                preparedStatement2.setInt(1, ecole.getEcoleId());
+                preparedStatement2.executeUpdate();
+            }
+        }
+        connection.commit();
+    } catch (SQLException e) {
+        try {
+            connection.rollback();
+            return false;
+        } catch (SQLException e2) {
+            e2.printStackTrace();
+            return false;
+        }
+    }
+    return true;
+}
+
 }
