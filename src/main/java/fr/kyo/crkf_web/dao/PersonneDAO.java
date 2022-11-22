@@ -77,8 +77,8 @@ public class PersonneDAO extends DAO<Personne> {
                     Personne personne = new Personne();
                     personne.setPersonneNom(rs.getString(1));
                     personne.setPersonnePrenom(rs.getString(2));
-                    personne.setEcoleID(DAOFactory.getEcoleDAO().getByID(rs.getInt(3)));
-                    personne.setAdresseId((DAOFactory.getAdresseDAO().getByID(rs.getInt(4))));
+                    personne.setEcoleObject(DAOFactory.getEcoleDAO().getByID(rs.getInt(3)));
+                    personne.setAdresseObject((DAOFactory.getAdresseDAO().getByID(rs.getInt(4))));
                     personne.setPersonneId(rs.getInt(5));
                     personnesEtDistances.add(new Pair<>(personne, ( Math.round(distance * 100.0) / 100.0 )));
                 }
@@ -177,6 +177,34 @@ public class PersonneDAO extends DAO<Personne> {
         return true;
     }
 
+    public boolean delete(List<Personne> objectList) {
+        try {
+            for(Personne personne : objectList){
+                String requete = "DELETE FROM Personne WHERE id_personne=?";
+                try (PreparedStatement preparedStatement = connection.prepareStatement(requete)){
+                    connection.setAutoCommit(false);
+                    preparedStatement.setInt(1, personne.getPersonneId());
+                    preparedStatement.executeUpdate();
+                }
+                String requete2 = "DELETE FROM Personne_Diplome WHERE id_personne=?";
+                try (PreparedStatement preparedStatement2 = connection.prepareStatement(requete2)){
+                    preparedStatement2.setInt(1, personne.getPersonneId());
+                    preparedStatement2.executeUpdate();
+                }
+            }
+            connection.commit();
+            return true;
+        } catch(SQLException e) {
+            try {
+                connection.rollback();
+                return false;
+            } catch (SQLException e2) {
+                e2.printStackTrace();
+            }
+        }
+        return true;
+    }
+
     private void getDiplomesOfPersonne(int id, Personne personne){
         String requete = "select id_libelle, id_instrument from Personne_Diplome where id_personne = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(requete)){
@@ -196,8 +224,8 @@ public class PersonneDAO extends DAO<Personne> {
             personne.setPersonneNom(rs.getString(2));
             personne.setPersonnePrenom(rs.getString(3));
             personne.setVehiculeCv(rs.getInt(4));
-            personne.setAdresseId(DAOFactory.getAdresseDAO().getByID(rs.getInt(5)));
-            personne.setEcoleID(DAOFactory.getEcoleDAO().getByID(rs.getInt(6)));
+            personne.setAdresseObject(DAOFactory.getAdresseDAO().getByID(rs.getInt(5)));
+            personne.setEcoleObject(DAOFactory.getEcoleDAO().getByID(rs.getInt(6)));
             getDiplomesOfPersonne(id, personne);
             liste.add(personne);
         }
@@ -207,7 +235,7 @@ public class PersonneDAO extends DAO<Personne> {
         preparedStatement.setString(1, object.getPersonneNom());
         preparedStatement.setString(2, object.getPersonnePrenom());
         preparedStatement.setInt(3, object.getVehiculeCv());
-        preparedStatement.setInt(4, object.getAdresseId().getAdresseId());
-        preparedStatement.setInt(5, object.getEcoleID().getEcoleId());
+        preparedStatement.setInt(4, object.getAdresseId());
+        preparedStatement.setInt(5, object.getEcoleID());
     }
 }

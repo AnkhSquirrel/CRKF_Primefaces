@@ -14,7 +14,7 @@ public class CRKFConnect {
         if (connexion == null) {
             try {
                 SQLServerDataSource ds = new SQLServerDataSource();
-                ds.setServerName("db");
+                ds.setServerName("localhost");
                 ds.setPortNumber(1433);
                 ds.setDatabaseName("CRKF");
                 ds.setIntegratedSecurity(false);
