@@ -64,19 +64,39 @@ public class Personne {
         this.vehiculeCv = vehiculeCv;
     }
 
-    public Adresse getAdresseId() {
+    public int getAdresseId() {
+        return adresseId;
+    }
+
+    public void setAdresseId(int adresseId) {
+        this.adresseId = adresseId;
+    }
+
+    public void setEcoleObject(int ecoleID) {
+        this.ecoleID = ecoleID;
+    }
+
+    public Adresse getAdresseObject() {
         return DAOFactory.getAdresseDAO().getByID(adresseId);
     }
 
-    public void setAdresseId(Adresse adresseId) {
+    public void setAdresseObject(Adresse adresseId) {
         this.adresseId = adresseId.getAdresseId();
     }
 
-    public Ecole getEcoleID() {
+    public int getEcoleID() {
+        return ecoleID;
+    }
+
+    public void setEcoleID(int ecoleID) {
+        this.ecoleID = ecoleID;
+    }
+
+    public Ecole getEcoleObject() {
         return DAOFactory.getEcoleDAO().getByID(ecoleID);
     }
 
-    public void setEcoleID(Ecole ecoleID) {
+    public void setEcoleObject(Ecole ecoleID) {
         this.ecoleID = ecoleID.getEcoleId();
     }
 

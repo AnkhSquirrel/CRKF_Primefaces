@@ -44,9 +44,7 @@ public class EcoleBean implements Serializable {
     }
 
     public void saveEcole() {
-        System.out.println("1");
         if (this.selectedEcole.getEcoleId() == 0) {
-            System.out.println("2");
             if(DAOFactory.getEcoleDAO().insert(selectedEcole) != 0){
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Ecole ajoutée"));
             }else{
@@ -54,7 +52,6 @@ public class EcoleBean implements Serializable {
             }
         }
         else {
-            System.out.println("3");
             if( DAOFactory.getEcoleDAO().update(selectedEcole)){
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Instrument Modifier"));
             }else{
