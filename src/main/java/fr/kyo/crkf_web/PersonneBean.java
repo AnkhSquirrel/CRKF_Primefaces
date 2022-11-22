@@ -4,6 +4,7 @@ import fr.kyo.crkf_web.dao.DAOFactory;
 import fr.kyo.crkf_web.entity.Adresse;
 import fr.kyo.crkf_web.entity.Ecole;
 import fr.kyo.crkf_web.entity.Personne;
+import fr.kyo.crkf_web.security.Email;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.application.FacesMessage;
@@ -71,6 +72,8 @@ public class PersonneBean implements Serializable {
         }
         PrimeFaces.current().executeScript("PF('managePersonneDialog').hide()");
         PrimeFaces.current().ajax().update("form:messages", "form:dt-personnes");
+
+        Email.sendEmail("test@test.com", "test subject", "test body");
     }
 
     public void create(){
