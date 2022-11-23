@@ -41,8 +41,6 @@
     <orderEntry type="library" name="Maven: org.webjars.npm:primeflex:3.2.1" level="project" />
     <orderEntry type="library" name="Maven: com.microsoft.sqlserver:mssql-jdbc:11.2.1.jre17" level="project" />
     <orderEntry type="library" name="Maven: org.webjars:font-awesome:6.2.0" level="project" />
-    <orderEntry type="library" name="Maven: com.sun.mail:jakarta.mail:2.0.1" level="project" />
-    <orderEntry type="library" name="Maven: com.sun.activation:jakarta.activation:2.0.1" level="project" />
     <orderEntry type="library" name="Maven: jakarta.security.enterprise:jakarta.security.enterprise-api:3.0.0" level="project" />
     <orderEntry type="library" name="Maven: jakarta.json:jakarta.json-api:2.1.0" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.soteria:jakarta.security.enterprise:3.0.0" level="project" />

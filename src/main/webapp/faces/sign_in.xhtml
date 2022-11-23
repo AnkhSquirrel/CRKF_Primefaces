@@ -18,23 +18,27 @@
                     <div class="surface-section text-center">
 
                         <h:form>
-                            <p:messages id="msgs"/>
-
-                            <h:panelGrid class="card" style="text-align:center; margin: 0 auto">
+                            <h:panelGrid class="card" style="margin: 0 auto">
                                 <div class="input">
                                     <p:outputLabel for="email" value="Email"/>
-                                    <p:inputText id="email" value="#{userBean.email}" required="true" label="Email"/>
-                                    <p:message for="email" display="icon"/>
+                                    <p:inputText id="email" value="#{userBean.compte.email}" type="email" required="true" validator="emailValidator"/>
+                                    <p:message for="email"/>
                                 </div>
 
                                 <div class="input">
                                     <p:outputLabel for="password" value="Password"/>
-                                    <p:inputText id="password" value="#{userBean.password}" label="Password" type="password" required="true"/>
-                                    <p:message for="password" id="msgPassword" display="icon"/>
+                                    <p:inputText id="password" value="#{userBean.compte.mot_de_passe}" label="Password" type="password" required="true" validator="passwordValidator"/>
+                                    <p:message for="password"/>
                                 </div>
 
-                                <p:commandButton value="Valider" update="@form" icon="pi pi-check" actionListener="#{userBean.sendVerificationEmail()}"/>
+                                <p:commandButton value="Valider" update="@form" actionListener="#{userBean.sendVerificationEmail}" rendered="#{not userBean.formStatut}" icon="pi pi-check"/>
+                                <p:commandButton value="Valider" update="@form" actionListener="#{userBean.login}" rendered="#{userBean.formStatut}" icon="pi pi-check"/>
+
                             </h:panelGrid>
+                        </h:form>
+                        <h:form>
+                            <p:commandButton value="Se connecter" update="@form" actionListener="#{userBean.changeForm}" rendered="#{not userBean.formStatut}" icon="pi pi-check"/>
+                            <p:commandButton value="S'inscrire" update="@form" actionListener="#{userBean.changeForm}" rendered="#{userBean.formStatut}" icon="pi pi-check"/>
                         </h:form>
                     </div>
                 </ui:define>

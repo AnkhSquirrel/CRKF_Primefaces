@@ -1,23 +1,43 @@
 package fr.kyo.crkf_web.bean;
 
 import fr.kyo.crkf_web.security.SecurityTools;
-import jakarta.enterprise.context.SessionScoped;
+import fr.kyo.crkf_web.dao.DAOFactory;
+import fr.kyo.crkf_web.entity.Compte;
+
 import jakarta.faces.context.FacesContext;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.SessionScoped;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import java.io.Serializable;
+
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.glassfish.soteria.identitystores.hash.Pbkdf2PasswordHashImpl;
+
 
 @Named("userBean")
 @SessionScoped
 public class UserBean implements Serializable {
-    private transient String email;
-    private transient String password;
+    @Inject
+    private BeanManager beanManager;
+    private Pbkdf2PasswordHashImpl pbkdf2PasswordHash;
+    private Compte compte;
+    private boolean formStatut;
+
+    @PostConstruct
+    private void init(){
+        compte = new Compte();
+        pbkdf2PasswordHash = new Pbkdf2PasswordHashImpl();
+    }
 
     public void sendVerificationEmail() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         String verificationUrl = SecurityTools.generateVerificationUrl(email, password);
@@ -41,19 +61,43 @@ public class UserBean implements Serializable {
         }
     }
 
-    public String getEmail() {
-        return email;
+    private void hash() {
+        pbkdf2PasswordHash = new Pbkdf2PasswordHashImpl();
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("Pbkdf2PasswordHash.Algorithm", "PBKDF2WithHmacSHA256");
+        parameters.put("Pbkdf2PasswordHash.Iterations", "300000");
+        parameters.put("Pbkdf2PasswordHash.SaltSizeBytes", "64");
+        parameters.put("Pbkdf2PasswordHash.KeySizeBytes", "64");
+
+        pbkdf2PasswordHash.initialize(parameters);
+
+        String generate = pbkdf2PasswordHash.generate(compte.getMot_de_passe().toCharArray());
+
+        compte.setMot_de_passe(generate.split(":")[2] + ":" + generate.split(":")[3]);
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void login(){
+        System.out.println("login");
     }
 
-    public String getPassword() {
-        return password;
+    public void changeForm(){
+        formStatut = !formStatut;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public Compte getCompte() {
+        return compte;
+    }
+
+    public void setCompte(Compte compte) {
+        this.compte = compte;
+    }
+
+    public boolean isFormStatut() {
+        return formStatut;
+    }
+
+    public void setFormStatut(boolean formStatut) {
+        this.formStatut = formStatut;
     }
 }
