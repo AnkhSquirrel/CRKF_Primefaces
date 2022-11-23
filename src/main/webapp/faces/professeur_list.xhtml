@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      lang="fr">
+<f:view>
+    <h:body>
+        <ui:composition template="templates/layout.xhtml"
+                        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                        xmlns:h="http://xmlns.jcp.org/jsf/html">
+            <ui:define name="title">Professeur - CRKF</ui:define>
+            <ui:define name="content">
+                <div class="card crud-demo">
+                    <h:form id="form">
+                        <p:growl id="messages" showDetail="true" />
+
+                        <p:toolbar>
+                            <p:toolbarGroup>
+                                <p:commandButton value="Nouveau" icon="pi pi-plus" actionListener="#{personneBean.openNew()}"
+                                                 update=":dialogs:manage-personne-content" oncomplete="PF('managePersonneDialog').show()"
+                                                 styleClass="ui-button-success" style="margin-right: .5rem">
+                                    <p:resetInput target=":dialogs:manage-personne-content" />
+                                </p:commandButton>
+                                <p:commandButton id="delete-personnes-button"
+                                                 icon="pi pi-trash"
+                                                 styleClass="ui-button-danger" update="@this"
+                                                 actionListener="#{personneBean.deleteList()}">
+                                    <p:confirm header="Confirmation" message="Supprimer les professeurs selectionnés?"
+                                               icon="pi pi-exclamation-triangle" />
+                                </p:commandButton>
+                            </p:toolbarGroup>
+                        </p:toolbar>
+
+                        <p:dataTable id="dt-personnes" widgetVar="dtPersonne" var="personne" value="#{personneBean.personneList}"
+                                     reflow="true" styleClass="products-table" selection="#{personneBean.selectedPersonnes}"
+                                     rowKey="#{personne.personneId}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+
+                            <f:facet name="header">
+                                <div class="products-table-header">
+                                    <span style="font-weight: bold">PROFESSEUR</span>
+                                    <span class="filter-container ui-input-icon-left"> <i class="pi pi-search"></i>
+                                        <p:inputText id="globalFilter" onkeyup="PF('dtPersonne').filter()" placeholder="Search" />
+                                    </span>
+                                </div>
+                            </f:facet>
+
+                            <p:ajax event="rowSelect" update=":form:delete-personnes-button" />
+                            <p:ajax event="rowUnselect" update=":form:delete-personnes-button" />
+                            <p:ajax event="rowSelectCheckbox" update=":form:delete-personnes-button" />
+                            <p:ajax event="rowUnselectCheckbox" update=":form:delete-personnes-button" />
+                            <p:ajax event="toggleSelect" update=":form:delete-personnes-button" />
+
+                            <p:column selectionMode="multiple" exportable="false"/>
+
+                            <p:column headerText="Nom" sortBy="${personne.personneNom}">
+                                <h:outputText value="${personne.personneNom}"/>
+                            </p:column>
+                            <p:column headerText="Prénom" sortBy="${personne.personnePrenom}">
+                                <h:outputText value="${personne.personnePrenom}" />
+                            </p:column>
+
+                            <p:column exportable="false">
+                                <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-personne-content"
+                                                 oncomplete="PF('managePersonneDialog').show()"
+                                                 styleClass="edit-button rounded-button ui-button-success" process="@this">
+                                    <f:setPropertyActionListener value="#{personne}" target="#{personneBean.selectedPersonne}"  />
+                                    <p:resetInput target=":dialogs:manage-personne-content" />
+                                </p:commandButton>
+                                <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash"
+                                                 process="@this"
+                                                 oncomplete="PF('deletePersonneDialog').show()">
+                                    <f:setPropertyActionListener value="#{personne}" target="#{personneBean.selectedPersonne}" />
+                                </p:commandButton>
+                            </p:column>
+
+                        </p:dataTable>
+                    </h:form>
+
+                    <h:form id="dialogs">
+                        <p:dialog header="Details Professeurs" showEffect="fade" modal="true" widgetVar="managePersonneDialog" responsive="true">
+                            <p:outputPanel id="manage-personne-content" class="ui-fluid">
+                                <p:outputPanel rendered="#{not empty personneBean.selectedPersonne}">
+                                    <p:outputLabel for="nom">Nom</p:outputLabel>
+                                    <p:inputText id="nom" value="#{personneBean.selectedPersonne.personneNom}" required="true"/>
+
+                                    <p:outputLabel for="firstName">Prénom</p:outputLabel>
+                                    <p:inputText id="firstName" value="#{personneBean.selectedPersonne.personnePrenom}" required="true"/>
+
+                                    <p:outputLabel for="cv">CV véhicule</p:outputLabel>
+                                    <p:inputText id="cv" value="#{personneBean.selectedPersonne.vehiculeCv}" required="true"/>
+
+                                    <p:outputLabel for="adresse">Adresse</p:outputLabel>
+                                    <p:inputText id="adresse" value="#{personneBean.query}" >
+                                        <p:ajax event="keyup" update="adresseCombo" listener="#{personneBean.refreshAdresseList}"/>
+                                    </p:inputText>
+                                    <p:selectOneMenu id="adresseCombo" value="#{personneBean.selectedPersonne.adresseId}" effect="fade" required="true">
+                                        <f:selectItems value="#{personneBean.adresseList}" var="address" itemLabel="#{address.adresseLibelle}" itemValue="#{address.adresseId}"/>
+                                    </p:selectOneMenu>
+
+                                    <p:outputLabel for="school">École</p:outputLabel>
+                                    <p:selectOneMenu id="school" value="#{personneBean.selectedPersonne.ecoleID}" var="school" filter="true" filterMatchMode="contains" required="true">
+                                        <f:selectItems value="#{personneBean.ecoleList}" var="ecole" itemLabel="#{ecole.ecoleNom}" itemValue="#{ecole.ecoleId}"/>
+                                    </p:selectOneMenu>
+
+                                </p:outputPanel>
+                            </p:outputPanel>
+
+                            <f:facet name="footer">
+                                <p:commandButton value="Enregistrer" icon="pi pi-check" actionListener="#{personneBean.save}"
+                                                 update=":form:dt-personnes" process="manage-personne-content @this" />
+                                <p:commandButton value="Annuler" icon="pi pi-times" onclick="PF('managePersonneDialog').hide()"
+                                                 class="ui-button-secondary" type="button" />
+                            </f:facet>
+                        </p:dialog>
+
+                        <p:confirmDialog widgetVar="deletePersonneDialog" showEffect="fade" width="300"
+                                         message="Supprimer le professeur?" header="Confirm" severity="warn">
+                            <p:commandButton value="Oui" icon="pi pi-check"
+                                             process="@this" update=":form:dt-personnes"
+                                             oncomplete="PF('deletePersonneDialog').hide()" actionListener="#{personneBean.deleteOne}"/>
+                            <p:commandButton value="Non" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                             onclick="PF('deletePersonneDialog').hide()" />
+                        </p:confirmDialog>
+
+                        <p:confirmDialog global="true" showEffect="fade" width="300">
+                            <p:commandButton value="Oui" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                            <p:commandButton value="Non" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"
+                                             icon="pi pi-times" />
+                        </p:confirmDialog>
+                    </h:form>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</f:view>
+</html>
