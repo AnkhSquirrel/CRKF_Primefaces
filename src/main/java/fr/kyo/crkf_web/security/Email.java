@@ -1,5 +1,6 @@
 package fr.kyo.crkf_web.security;
 
+
 import jakarta.mail.*;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;

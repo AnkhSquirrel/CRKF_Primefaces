@@ -2,16 +2,16 @@ package fr.kyo.crkf_web.entity;
 
 public class Compte {
     private String email;
-    private String mot_de_passe;
+    private String password;
 
     public Compte() {
         this.email = "";
-        this.mot_de_passe = "";
+        this.password = "";
     }
 
-    public Compte(String email, String mot_de_passe) {
+    public Compte(String email, String password) {
         this.email = email;
-        this.mot_de_passe = mot_de_passe;
+        this.password = password;
     }
 
     public String getEmail() {
@@ -22,11 +22,11 @@ public class Compte {
         this.email = email;
     }
 
-    public String getMot_de_passe() {
-        return mot_de_passe;
+    public String getPassword() {
+        return password;
     }
 
-    public void setMot_de_passe(String mot_de_passe) {
-        this.mot_de_passe = mot_de_passe;
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

@@ -1,8 +1,11 @@
 package fr.kyo.crkf_web.dao;
 
 import fr.kyo.crkf_web.entity.Compte;
+import fr.kyo.crkf_web.entity.Famille;
+import fr.kyo.crkf_web.entity.Instrument;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CompteDAO extends DAO<Compte> {
@@ -23,17 +26,17 @@ public class CompteDAO extends DAO<Compte> {
 
     @Override
     public int insert(Compte objet) {
-        String requete = "INSERT INTO Compte (email,mot_de_passe) VALUES (?,?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(requete, Statement.RETURN_GENERATED_KEYS)){
+        String requete = "INSERT INTO Compte (email,password) VALUES (?,?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(requete, Statement.RETURN_GENERATED_KEYS)) {
             connection.setAutoCommit(false);
-            preparedStatement.setString( 1 , objet.getEmail());
-            preparedStatement.setString(2, objet.getMot_de_passe());
+            preparedStatement.setString(1, objet.getEmail());
+            preparedStatement.setString(2, objet.getPassword());
             preparedStatement.executeUpdate();
             ResultSet rs = preparedStatement.getGeneratedKeys();
             connection.commit();
             rs.next();
             return rs.getInt(1);
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             try {
                 connection.rollback();
                 return 0;
@@ -51,6 +54,18 @@ public class CompteDAO extends DAO<Compte> {
 
     @Override
     public boolean delete(Compte object) {
+        return false;
+    }
+
+    public boolean exists(String email) {
+        String requete = "select id_compte from Compte where email = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(requete)) {
+            preparedStatement.setString(1, email);
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.next()) return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 }
