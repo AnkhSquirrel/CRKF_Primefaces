@@ -15,13 +15,11 @@ public class Email {
     public static void sendEmail(String toEmail, String subject, String body){
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.mailtrap.io"); //SMTP Host
-        props.put("mail.smtp.port", "456"); //SMTP Port
-        props.put("mail.smtp.auth", "true"); //Enabling SMTP Authentication
-        props.put("mail.smtp.socketFactory.fallback", "false");
+        props.put("mail.smtp.port", "465"); //SMTP Port
+        props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory"); //SSL Factory Class
         props.put("mail.smtp.socketFactory.port", "465"); //SSL Port
-        props.put("mail.smtp.socketFactory.class", "jakarta.net.ssl.SSLSocketFactory"); //SSL Factory Class
-        props.put("mail.smtp.ssl.checkserveridentity", true); // Compliant
-
+        props.put("mail.smtp.auth", "true"); //Enabling SMTP Authentication
+        props.put("mail.smtp.ssl.checkserveridentity", true);
 
         Authenticator auth = new Authenticator() {
             @Override
@@ -34,9 +32,7 @@ public class Email {
 
         try {
             MimeMessage msg = new MimeMessage(session);
-            //set message headers
             msg.addHeader("Content-type", "text/HTML; charset=UTF-8");
-            //msg.addHeader("format", "flowed");
             msg.addHeader("Content-Transfer-Encoding", "8bit");
             msg.setFrom(new InternetAddress("from@test.fr", "NoReply"));
             msg.setReplyTo(InternetAddress.parse("replyto@test.fr", false));

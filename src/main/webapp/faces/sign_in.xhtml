@@ -23,17 +23,17 @@
                             <h:panelGrid class="card" style="text-align:center; margin: 0 auto">
                                 <div class="input">
                                     <p:outputLabel for="email" value="Email"/>
-                                    <p:inputText id="email" value="" required="true" label="Email"/>
+                                    <p:inputText id="email" value="#{userBean.email}" required="true" label="Email"/>
                                     <p:message for="email" display="icon"/>
                                 </div>
 
                                 <div class="input">
                                     <p:outputLabel for="password" value="Password"/>
-                                    <p:inputText id="password" value="" label="Password" type="password" required="true"/>
+                                    <p:inputText id="password" value="#{userBean.password}" label="Password" type="password" required="true"/>
                                     <p:message for="password" id="msgPassword" display="icon"/>
                                 </div>
 
-                                <p:commandButton value="Valider" update="@form" icon="pi pi-check"/>
+                                <p:commandButton value="Valider" update="@form" icon="pi pi-check" actionListener="#{userBean.sendVerificationEmail()}"/>
                             </h:panelGrid>
                         </h:form>
                     </div>

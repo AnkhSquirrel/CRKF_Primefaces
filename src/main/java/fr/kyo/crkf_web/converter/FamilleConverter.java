@@ -1,6 +1,6 @@
 package fr.kyo.crkf_web.converter;
 
-import fr.kyo.crkf_web.InstrumentBean;
+import fr.kyo.crkf_web.bean.InstrumentBean;
 import fr.kyo.crkf_web.entity.Famille;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;

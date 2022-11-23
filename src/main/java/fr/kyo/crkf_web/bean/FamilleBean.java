@@ -1,4 +1,4 @@
-package fr.kyo.crkf_web;
+package fr.kyo.crkf_web.bean;
 
 import fr.kyo.crkf_web.dao.DAOFactory;
 import fr.kyo.crkf_web.entity.Classification;
