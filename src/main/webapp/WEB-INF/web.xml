@@ -21,4 +21,9 @@
         <url-pattern>*.xhtml</url-pattern>
     </servlet-mapping>
 
+    <resource-env-ref>
+        <resource-env-ref-name>BeanManager</resource-env-ref-name>
+        <resource-env-ref-type>jakarta.enterprise.inject.spi.BeanManager</resource-env-ref-type>
+    </resource-env-ref>
+
 </web-app>
