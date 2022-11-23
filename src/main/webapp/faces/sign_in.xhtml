@@ -31,8 +31,9 @@
                                     <p:message for="password"/>
                                 </div>
 
-                                <p:commandButton value="Valider" update="@form" actionListener="#{userBean.confirm}" rendered="#{not userBean.formStatut}" icon="pi pi-check"/>
+                                <p:commandButton value="Valider" update="@form" actionListener="#{userBean.sendVerificationEmail}" rendered="#{not userBean.formStatut}" icon="pi pi-check"/>
                                 <p:commandButton value="Valider" update="@form" actionListener="#{userBean.login}" rendered="#{userBean.formStatut}" icon="pi pi-check"/>
+
                             </h:panelGrid>
                         </h:form>
                         <h:form>

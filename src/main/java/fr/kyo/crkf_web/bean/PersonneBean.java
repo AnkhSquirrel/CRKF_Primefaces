@@ -1,9 +1,10 @@
-package fr.kyo.crkf_web;
+package fr.kyo.crkf_web.bean;
 
 import fr.kyo.crkf_web.dao.DAOFactory;
 import fr.kyo.crkf_web.entity.Adresse;
 import fr.kyo.crkf_web.entity.Ecole;
 import fr.kyo.crkf_web.entity.Personne;
+import fr.kyo.crkf_web.security.Email;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.application.FacesMessage;
