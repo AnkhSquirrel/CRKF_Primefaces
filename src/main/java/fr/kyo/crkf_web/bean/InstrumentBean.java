@@ -1,4 +1,4 @@
-package fr.kyo.crkf_web;
+package fr.kyo.crkf_web.bean;
 
 import fr.kyo.crkf_web.dao.DAOFactory;
 import fr.kyo.crkf_web.entity.Famille;
@@ -10,7 +10,6 @@ import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import org.primefaces.PrimeFaces;
 
-import javax.print.attribute.standard.Severity;
 import java.io.Serializable;
 import java.util.List;
 

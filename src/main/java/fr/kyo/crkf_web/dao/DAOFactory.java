@@ -47,5 +47,8 @@ public class DAOFactory {
     public static DiplomeDAO getDiplomeDAO() {
         return new DiplomeDAO(connexion);
     }
+    public static CompteDAO getCompteDAO() {
+        return new CompteDAO(connexion);
+    }
 
 }
