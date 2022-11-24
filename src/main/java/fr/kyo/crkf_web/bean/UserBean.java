@@ -1,7 +1,7 @@
 package fr.kyo.crkf_web.bean;
 
-import fr.kyo.crkf_web.security.SecurityTools;
 import fr.kyo.crkf_web.dao.DAOFactory;
+import fr.kyo.crkf_web.security.SecurityTools;
 import fr.kyo.crkf_web.entity.Compte;
 
 import jakarta.faces.context.FacesContext;
@@ -18,8 +18,9 @@ import javax.crypto.NoSuchPaddingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.*;
 
 import org.glassfish.soteria.identitystores.hash.Pbkdf2PasswordHashImpl;
 
@@ -40,24 +41,30 @@ public class UserBean implements Serializable {
     }
 
     public void sendVerificationEmail() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
-        String verificationUrl = SecurityTools.generateVerificationUrl(email, password);
+        hash();
+        String verificationUrl = SecurityTools.generateVerificationUrl(compte.getEmail(), compte.getPassword());
         String body = "Lien de verif = " + verificationUrl;
         //Email.sendEmail(email, "Verification d'email", body);
         System.out.println(body);
     }
 
     public String verifyUrl() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
-        String verificationCode = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("code");
+        String encryptedVerificationCode = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("code");
+        String decryptedVerificationCode = SecurityTools.decrypt(encryptedVerificationCode);
+        String[] verificationCodeVars = decryptedVerificationCode.split(":");
 
-        String checksum = SecurityTools.checksum(email+password).toString();
-        String encryptedData = SecurityTools.encrypt(email + ":" + password + ":" + checksum);
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(new Date());
+        boolean verificationCodeIsExpired = calendar.getTimeInMillis() > Long.parseLong(verificationCodeVars[3]);
+        boolean emailIsUsed = DAOFactory.getCompteDAO().exists(verificationCodeVars[0]);
 
-
-        if (verificationCode.equals(encryptedData) /* && le lien n'est pas expiré && l'user n'existe pas deja */){
-            // Création du compte
-            return "correct, création du comtpe";
-        } else {
+        if (verificationCodeIsExpired || emailIsUsed ){
             return "incorrect ou expiré, rien ne se passe";
+        } else {
+            compte.setEmail(verificationCodeVars[0]);
+            compte.setPassword(verificationCodeVars[1] + ":" + verificationCodeVars[2]);
+            DAOFactory.getCompteDAO().insert(compte);
+            return "correct, création du comtpe";
         }
     }
 
@@ -72,9 +79,9 @@ public class UserBean implements Serializable {
 
         pbkdf2PasswordHash.initialize(parameters);
 
-        String generate = pbkdf2PasswordHash.generate(compte.getMot_de_passe().toCharArray());
+        String generate = pbkdf2PasswordHash.generate(compte.getPassword().toCharArray());
 
-        compte.setMot_de_passe(generate.split(":")[2] + ":" + generate.split(":")[3]);
+        compte.setPassword(generate.split(":")[2] + ":" + generate.split(":")[3]);
     }
 
     public void login(){
