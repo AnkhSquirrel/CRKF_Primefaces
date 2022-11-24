@@ -24,6 +24,19 @@ public class CompteDAO extends DAO<Compte> {
         return null;
     }
 
+    public Compte getByEmail(String email) {
+        String requete = "select id_compte, email, password from Compte where email = ?";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(requete)) {
+            preparedStatement.setString(1, email);
+            ResultSet rs = preparedStatement.executeQuery();
+            if(rs.next())
+                return new Compte(rs.getInt(1), rs.getString(2), rs.getString(3));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     @Override
     public int insert(Compte objet) {
         String requete = "INSERT INTO Compte (email,password) VALUES (?,?)";
