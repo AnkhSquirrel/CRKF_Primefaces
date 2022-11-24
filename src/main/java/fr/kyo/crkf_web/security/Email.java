@@ -11,9 +11,10 @@ import java.util.Properties;
 
 public class Email {
 
-    private Email(){}
+    private Email() {
+    }
 
-    public static void sendEmail(String toEmail, String subject, String body){
+    public static void sendEmail(String toEmail, String subject, String body) {
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.mailtrap.io"); //SMTP Host
         props.put("mail.smtp.port", "465"); //SMTP Port
@@ -38,7 +39,7 @@ public class Email {
             msg.setFrom(new InternetAddress("from@test.fr", "NoReply"));
             msg.setReplyTo(InternetAddress.parse("replyto@test.fr", false));
             msg.setSubject(subject, "UTF-8");
-            msg.setText(body, "UTF-8");
+            msg.setContent(body, "text/html");
             msg.setSentDate(new Date());
             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
             Transport.send(msg);

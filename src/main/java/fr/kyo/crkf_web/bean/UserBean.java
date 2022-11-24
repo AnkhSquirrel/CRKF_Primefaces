@@ -1,6 +1,7 @@
 package fr.kyo.crkf_web.bean;
 
 import fr.kyo.crkf_web.dao.DAOFactory;
+import fr.kyo.crkf_web.security.Email;
 import fr.kyo.crkf_web.security.SecurityTools;
 import fr.kyo.crkf_web.entity.Compte;
 
@@ -16,16 +17,15 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.glassfish.soteria.identitystores.hash.Pbkdf2PasswordHashImpl;
 import org.primefaces.PrimeFaces;
-
 
 @Named("userBean")
 @SessionScoped
@@ -37,30 +37,38 @@ public class UserBean implements Serializable {
     private boolean formStatut;
 
     @PostConstruct
-    private void init(){
+    private void init() {
         compte = new Compte();
         pbkdf2PasswordHash = new Pbkdf2PasswordHashImpl();
     }
 
-    public void sendVerificationEmail() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
-        if(!DAOFactory.getCompteDAO().exists(compte.getEmail())){
+    public void sendVerificationEmail() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException, IOException {
+        if (!DAOFactory.getCompteDAO().exists(compte.getEmail())) {
             hash();
-
             String verificationUrl = SecurityTools.generateVerificationUrl(compte.getEmail(), compte.getPassword());
-            String body = "Lien de verif = " + verificationUrl;
+            String genericBody = getResourceFileAsString("/mails/verification.html");
+            String customizedBody = genericBody.replaceAll("VERIFICATION_URL", verificationUrl);
+
+            Email.sendEmail(compte.getEmail(), "Verification d'email", customizedBody);
 
             compte = new Compte();
 
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Inscription validé", "Vérifier votre boite mail pour activer votre compte"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Inscription validé", "Vérifier votre boite mail pour activer votre compte"));
             PrimeFaces.current().ajax().update("messages");
-
-            //Email.sendEmail(email, "Verification d'email", body);
-            System.out.println(body);
-        }else{
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Inscription invalide", "Un compte existe déja avec cette adresse email"));
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Inscription invalide", "Un compte existe déja avec cette adresse email"));
             PrimeFaces.current().ajax().update("messages");
         }
+    }
 
+    private String getResourceFileAsString(String fileName) throws IOException {
+        try (InputStream inputStream = Objects.requireNonNull(getClass().getResource(fileName)).openStream()) {
+            if (inputStream == null) return null;
+            try (InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                return bufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
+            }
+        }
     }
 
     public String verifyUrl() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
@@ -70,10 +78,14 @@ public class UserBean implements Serializable {
 
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(new Date());
-        boolean verificationCodeIsExpired = calendar.getTimeInMillis() > Long.parseLong(verificationCodeVars[2]);
-        boolean emailIsUsed = DAOFactory.getCompteDAO().exists(verificationCodeVars[0]);
 
-        if (verificationCodeIsExpired || emailIsUsed ){
+        String verificationCodeChecksum = SecurityTools.checksum(verificationCodeVars[0] + verificationCodeVars[1] + verificationCodeVars[2]).toString();
+
+        boolean emailIsUsed = DAOFactory.getCompteDAO().exists(verificationCodeVars[0]);
+        boolean verificationCodeIsExpired = calendar.getTimeInMillis() > Long.parseLong(verificationCodeVars[2]);
+        boolean checksumIsInvalid = !verificationCodeChecksum.equals(verificationCodeVars[3]);
+
+        if (emailIsUsed || verificationCodeIsExpired || checksumIsInvalid) {
             return "incorrect ou expiré, rien ne se passe";
         } else {
             compte.setEmail(verificationCodeVars[0]);
@@ -99,27 +111,27 @@ public class UserBean implements Serializable {
         compte.setPassword(generate);
     }
 
-    public void login(){
+    public void login() {
         Compte temp = DAOFactory.getCompteDAO().getByEmail(compte.getEmail());
-        if(temp != null){
+        if (temp != null) {
             System.out.println("Email exist");
 
             pbkdf2PasswordHash = new Pbkdf2PasswordHashImpl();
 
-            if(pbkdf2PasswordHash.verify(compte.getPassword().toCharArray(), temp.getPassword())){
+            if (pbkdf2PasswordHash.verify(compte.getPassword().toCharArray(), temp.getPassword())) {
                 System.out.println("Password: Accept");
 
-            }else{
-                FacesContext.getCurrentInstance().addMessage("email", new FacesMessage(FacesMessage.SEVERITY_ERROR,"Erreur de Validation", "Mot de passe incorrect"));
+            } else {
+                FacesContext.getCurrentInstance().addMessage("email", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erreur de Validation", "Mot de passe incorrect"));
             }
-        }else{
-            FacesContext.getCurrentInstance().addMessage("password", new FacesMessage(FacesMessage.SEVERITY_ERROR,"Erreur de Validation", "Il n'y a pas de compte avec cette adresse email"));
+        } else {
+            FacesContext.getCurrentInstance().addMessage("password", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erreur de Validation", "Il n'y a pas de compte avec cette adresse email"));
         }
 
         PrimeFaces.current().ajax().update("messages");
     }
 
-    public void changeForm(){
+    public void changeForm() {
         formStatut = !formStatut;
         PrimeFaces.current().ajax().update("form");
     }

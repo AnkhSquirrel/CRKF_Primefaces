@@ -49,6 +49,6 @@ public class SecurityTools {
         long timeLimit = calendar.getTimeInMillis();
         String checksum = checksum(email + password + timeLimit).toString();
         String encryptedData = encrypt(email + ";" + password + ";" + timeLimit + ";" + checksum);
-        return "localhost:8080/CRKF_Web_war_exploded/faces/verification.xhtml?code=" + encryptedData;
+        return "http://localhost:8080/CRKF_Web_war_exploded/faces/verification.xhtml?code=" + encryptedData;
     }
 }
