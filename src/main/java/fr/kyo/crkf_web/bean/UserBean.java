@@ -1,6 +1,7 @@
 package fr.kyo.crkf_web.bean;
 
 import fr.kyo.crkf_web.dao.DAOFactory;
+import fr.kyo.crkf_web.security.Email;
 import fr.kyo.crkf_web.security.SecurityTools;
 import fr.kyo.crkf_web.entity.Compte;
 
@@ -15,15 +16,14 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.glassfish.soteria.identitystores.hash.Pbkdf2PasswordHashImpl;
-
 
 @Named("userBean")
 @SessionScoped
@@ -40,12 +40,23 @@ public class UserBean implements Serializable {
         pbkdf2PasswordHash = new Pbkdf2PasswordHashImpl();
     }
 
-    public void sendVerificationEmail() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+    public void sendVerificationEmail() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException, IOException {
         hash();
         String verificationUrl = SecurityTools.generateVerificationUrl(compte.getEmail(), compte.getPassword());
-        String body = "Lien de verif = " + verificationUrl;
-        //Email.sendEmail(email, "Verification d'email", body);
-        System.out.println(body);
+        String genericBody = getResourceFileAsString("/mails/verification.html");
+        String customizedBody = genericBody.replaceAll("VERIFICATION_URL", verificationUrl);
+        System.out.println(customizedBody);
+        //Email.sendEmail(compte.getEmail(), "Vérification d'email", customizedBody);
+    }
+
+    private String getResourceFileAsString(String fileName) throws IOException {
+        try (InputStream inputStream = Objects.requireNonNull(getClass().getResource(fileName)).openStream()){
+            if (inputStream == null) return null;
+            try (InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8)) {
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                return bufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
+            }
+        }
     }
 
     public String verifyUrl() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
@@ -55,10 +66,14 @@ public class UserBean implements Serializable {
 
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(new Date());
+
+        String verificationCodeChecksum = SecurityTools.checksum(verificationCodeVars[0] + verificationCodeVars[1] + ":" + verificationCodeVars[2] + verificationCodeVars[3]).toString();
+
         boolean verificationCodeIsExpired = calendar.getTimeInMillis() > Long.parseLong(verificationCodeVars[3]);
         boolean emailIsUsed = DAOFactory.getCompteDAO().exists(verificationCodeVars[0]);
+        boolean checksumIsInvalid = !verificationCodeChecksum.equals(verificationCodeVars[4]);
 
-        if (verificationCodeIsExpired || emailIsUsed ){
+        if (verificationCodeIsExpired || emailIsUsed || checksumIsInvalid){
             return "incorrect ou expiré, rien ne se passe";
         } else {
             compte.setEmail(verificationCodeVars[0]);
