@@ -48,7 +48,7 @@ public class UserBean implements Serializable {
         System.out.println(body);
     }
 
-    public String verifyUrl() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException, ParseException {
+    public String verifyUrl() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         String encryptedVerificationCode = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("code");
         String decryptedVerificationCode = SecurityTools.decrypt(encryptedVerificationCode);
         String[] verificationCodeVars = decryptedVerificationCode.split(":");
