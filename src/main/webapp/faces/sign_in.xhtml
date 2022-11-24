@@ -17,7 +17,12 @@
 
                     <div class="surface-section text-center">
 
-                        <h:form>
+                        <h:form id="form">
+                            <p:growl id="messages" showDetail="true"/>
+
+                            <p:outputPanel rendered="#{not userBean.formStatut}"><h1>Inscription</h1></p:outputPanel>
+                            <p:outputPanel rendered="#{userBean.formStatut}"><h1>Connexion</h1></p:outputPanel>
+
                             <h:panelGrid class="card" style="margin: 0 auto">
                                 <div class="input">
                                     <p:outputLabel for="email" value="Email"/>
