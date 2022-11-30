@@ -63,19 +63,22 @@ public class SecurityTools {
         return "http://localhost:8080/CRKF_Web_war_exploded/faces/verification.xhtml?code=" + encryptedData;
     }
 
-    public static boolean checkVerificationCodeFormat(String[] verificationCodeVars){
-        String password = verificationCodeVars[1];
-        if(password.length() != 205)
-            return false;
+    public static boolean checkVerificationCodeFormat(String encryptedVerificationCode) {
+        try {
+            String decryptedVerificationCode = decrypt(encryptedVerificationCode);
+            String[] verificationCodeVars = decryptedVerificationCode.split(";");
 
-        String timeLimit = verificationCodeVars[2];
-        if (!timeLimit.matches("^[0-9]*$") || timeLimit.length() > 18)
-            return false;
+            String password = verificationCodeVars[1];
+            if (password.length() != 205) return false;
 
-        String checksum = verificationCodeVars[3];
-        if (!checksum.matches("^[0-9]*$") || checksum.length() > 18)
-            return false;
+            String timeLimit = verificationCodeVars[2];
+            if (!timeLimit.matches("^[0-9]*$") || timeLimit.length() > 18) return false;
 
+            String checksum = verificationCodeVars[3];
+            if (!checksum.matches("^[0-9]*$") || checksum.length() > 18) return false;
+        } catch (IllegalArgumentException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException exception) {
+            return false;
+        }
         return true;
     }
 }

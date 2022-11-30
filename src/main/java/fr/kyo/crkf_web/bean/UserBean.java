@@ -74,10 +74,9 @@ public class UserBean implements Serializable {
 
     public void verifyUrl() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         String encryptedVerificationCode = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("code");
-        String decryptedVerificationCode = SecurityTools.decrypt(encryptedVerificationCode);
-        String[] verificationCodeVars = decryptedVerificationCode.split(";");
-
-        if (SecurityTools.checkVerificationCodeFormat(verificationCodeVars)) {
+        if (SecurityTools.checkVerificationCodeFormat(encryptedVerificationCode)) {
+            String decryptedVerificationCode = SecurityTools.decrypt(encryptedVerificationCode);
+            String[] verificationCodeVars = decryptedVerificationCode.split(";");
             Calendar calendar = new GregorianCalendar();
             calendar.setTime(new Date());
             String verificationCodeChecksum = SecurityTools.checksum(verificationCodeVars[0] + verificationCodeVars[1] + verificationCodeVars[2]).toString();
@@ -86,11 +85,11 @@ public class UserBean implements Serializable {
             boolean checksumIsInvalid = !verificationCodeChecksum.equals(verificationCodeVars[3]);
 
             if (emailIsUsed)
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Erreur lors de l'inscription", "Un compte utilise déjà cette adresse email"));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erreur lors de l'inscription", "Un compte utilise déjà cette adresse email"));
             else if (verificationCodeIsExpired)
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Erreur lors de l'inscription", "Le lien de vérification est expirée"));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erreur lors de l'inscription", "Le lien de vérification est expirée"));
             else if (checksumIsInvalid)
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Erreur lors de l'inscription", "Le lien de vérification n'est pas valide"));
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erreur lors de l'inscription", "Le lien de vérification n'est pas valide"));
             else {
                 compte.setEmail(verificationCodeVars[0]);
                 compte.setPassword(verificationCodeVars[1]);
@@ -98,7 +97,7 @@ public class UserBean implements Serializable {
                 FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Inscription terminée", "Votre compte est à présent actif"));
             }
         } else {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erreur lors de l'inscription", "Un compte éxiste déjà avec cette adresse email"));
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erreur lors de l'inscription", "Le lien de vérification n'est pas valide"));
         }
         PrimeFaces.current().ajax().update("messages");
     }
