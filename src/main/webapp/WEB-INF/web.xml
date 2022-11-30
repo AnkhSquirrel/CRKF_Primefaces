@@ -26,9 +26,10 @@
         <resource-env-ref-type>jakarta.enterprise.inject.spi.BeanManager</resource-env-ref-type>
     </resource-env-ref>
 
+
     <error-page>
-        <exception-type>java.lang.IllegalArgumentException</exception-type>
-        <location>/faces/index.xhtml</location>
+        <exception-type>java.lang.NullPointerException</exception-type>
+        <location>/faces/error.xhtml</location>
     </error-page>
 
 </web-app>
