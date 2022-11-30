@@ -44,21 +44,22 @@ public class UserBean implements Serializable {
 
     public void sendVerificationEmail() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException, IOException {
         if (!DAOFactory.getCompteDAO().exists(compte.getEmail())) {
-            hash();
+            compte.setPassword(SecurityTools.hash(compte.getPassword()));
             String verificationUrl = SecurityTools.generateVerificationUrl(compte.getEmail(), compte.getPassword());
             String genericBody = getResourceFileAsString("/mails/verification.html");
             String customizedBody = genericBody.replaceAll("VERIFICATION_URL", verificationUrl);
 
-            Email.sendEmail(compte.getEmail(), "Verification d'email", customizedBody);
+            //Email.sendEmail(compte.getEmail(), "Verification d'email", customizedBody);
+            System.out.println("envoi mail");
+            System.out.println(verificationUrl);
 
             compte = new Compte();
 
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Inscription validé", "Vérifier votre boite mail pour activer votre compte"));
-            PrimeFaces.current().ajax().update("messages");
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Inscription validée", "Vérifiez votre boite mail pour activer votre compte"));
         } else {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Inscription invalide", "Un compte existe déja avec cette adresse email"));
-            PrimeFaces.current().ajax().update("messages");
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Inscription invalide", "Un compte éxiste déjà avec cette adresse email"));
         }
+        PrimeFaces.current().ajax().update("messages");
     }
 
     private String getResourceFileAsString(String fileName) throws IOException {
@@ -71,45 +72,37 @@ public class UserBean implements Serializable {
         }
     }
 
-    public String verifyUrl() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
+    public void verifyUrl() throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         String encryptedVerificationCode = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("code");
         String decryptedVerificationCode = SecurityTools.decrypt(encryptedVerificationCode);
         String[] verificationCodeVars = decryptedVerificationCode.split(";");
 
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(new Date());
+        if (SecurityTools.checkVerificationCodeFormat(verificationCodeVars)) {
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(new Date());
+            String verificationCodeChecksum = SecurityTools.checksum(verificationCodeVars[0] + verificationCodeVars[1] + verificationCodeVars[2]).toString();
+            boolean emailIsUsed = DAOFactory.getCompteDAO().exists(verificationCodeVars[0]);
+            boolean verificationCodeIsExpired = calendar.getTimeInMillis() > Long.parseLong(verificationCodeVars[2]);
+            boolean checksumIsInvalid = !verificationCodeChecksum.equals(verificationCodeVars[3]);
 
-        String verificationCodeChecksum = SecurityTools.checksum(verificationCodeVars[0] + verificationCodeVars[1] + verificationCodeVars[2]).toString();
-
-        boolean emailIsUsed = DAOFactory.getCompteDAO().exists(verificationCodeVars[0]);
-        boolean verificationCodeIsExpired = calendar.getTimeInMillis() > Long.parseLong(verificationCodeVars[2]);
-        boolean checksumIsInvalid = !verificationCodeChecksum.equals(verificationCodeVars[3]);
-
-        if (emailIsUsed || verificationCodeIsExpired || checksumIsInvalid) {
-            return "incorrect ou expiré, rien ne se passe";
+            if (emailIsUsed)
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Erreur lors de l'inscription", "Un compte utilise déjà cette adresse email"));
+            else if (verificationCodeIsExpired)
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Erreur lors de l'inscription", "Le lien de vérification est expirée"));
+            else if (checksumIsInvalid)
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Erreur lors de l'inscription", "Le lien de vérification n'est pas valide"));
+            else {
+                compte.setEmail(verificationCodeVars[0]);
+                compte.setPassword(verificationCodeVars[1]);
+                DAOFactory.getCompteDAO().insert(compte);
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Inscription terminée", "Votre compte est à présent actif"));
+            }
         } else {
-            compte.setEmail(verificationCodeVars[0]);
-            compte.setPassword(verificationCodeVars[1]);
-            DAOFactory.getCompteDAO().insert(compte);
-            return "correct, création du comtpe";
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erreur lors de l'inscription", "Un compte éxiste déjà avec cette adresse email"));
         }
+        PrimeFaces.current().ajax().update("messages");
     }
 
-    private void hash() {
-        pbkdf2PasswordHash = new Pbkdf2PasswordHashImpl();
-
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("Pbkdf2PasswordHash.Algorithm", "PBKDF2WithHmacSHA256");
-        parameters.put("Pbkdf2PasswordHash.Iterations", "300000");
-        parameters.put("Pbkdf2PasswordHash.SaltSizeBytes", "64");
-        parameters.put("Pbkdf2PasswordHash.KeySizeBytes", "64");
-
-        pbkdf2PasswordHash.initialize(parameters);
-
-        String generate = pbkdf2PasswordHash.generate(compte.getPassword().toCharArray());
-
-        compte.setPassword(generate);
-    }
 
     public void login() {
         Compte temp = DAOFactory.getCompteDAO().getByEmail(compte.getEmail());

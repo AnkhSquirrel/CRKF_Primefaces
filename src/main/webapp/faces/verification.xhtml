@@ -12,15 +12,12 @@
       <ui:composition template="templates/layout.xhtml"
                       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
                       xmlns:h="http://xmlns.jcp.org/jsf/html">
-         <ui:define name="title">Se Connecter - CRKF</ui:define>
+         <ui:define name="title">Vérification - CRKF</ui:define>
          <ui:define name="content">
-
-
-
 
             <h:outputLabel value="#{userBean.verifyUrl()}"/>
 
-
+            <p:growl id="messages" showDetail="true" sticky="true"/>
 
          </ui:define>
       </ui:composition>

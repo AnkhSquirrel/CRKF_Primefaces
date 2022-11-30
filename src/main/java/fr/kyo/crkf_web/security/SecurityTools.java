@@ -1,5 +1,8 @@
 package fr.kyo.crkf_web.security;
 
+import jakarta.security.enterprise.identitystore.Pbkdf2PasswordHash;
+import org.glassfish.soteria.identitystores.hash.Pbkdf2PasswordHashImpl;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -7,10 +10,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.*;
 
 public class SecurityTools {
 
@@ -42,6 +42,17 @@ public class SecurityTools {
         return checksum;
     }
 
+    public static String hash(String stringToHash) {
+        Pbkdf2PasswordHash pbkdf2PasswordHash = new Pbkdf2PasswordHashImpl();
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("Pbkdf2PasswordHash.Algorithm", "PBKDF2WithHmacSHA256");
+        parameters.put("Pbkdf2PasswordHash.Iterations", "300000");
+        parameters.put("Pbkdf2PasswordHash.SaltSizeBytes", "64");
+        parameters.put("Pbkdf2PasswordHash.KeySizeBytes", "64");
+        pbkdf2PasswordHash.initialize(parameters);
+        return pbkdf2PasswordHash.generate(stringToHash.toCharArray());
+    }
+
     public static String generateVerificationUrl(String email, String password) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(new Date());
@@ -50,5 +61,21 @@ public class SecurityTools {
         String checksum = checksum(email + password + timeLimit).toString();
         String encryptedData = encrypt(email + ";" + password + ";" + timeLimit + ";" + checksum);
         return "http://localhost:8080/CRKF_Web_war_exploded/faces/verification.xhtml?code=" + encryptedData;
+    }
+
+    public static boolean checkVerificationCodeFormat(String[] verificationCodeVars){
+        String password = verificationCodeVars[1];
+        if(password.length() != 205)
+            return false;
+
+        String timeLimit = verificationCodeVars[2];
+        if (!timeLimit.matches("^[0-9]*$") || timeLimit.length() > 18)
+            return false;
+
+        String checksum = verificationCodeVars[3];
+        if (!checksum.matches("^[0-9]*$") || checksum.length() > 18)
+            return false;
+
+        return true;
     }
 }
